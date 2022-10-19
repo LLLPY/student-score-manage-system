@@ -367,6 +367,67 @@ func Pk(course string, score1 uint64, score2 uint64, full_score uint64) {
 	}
 }
 
+//获取每一个成绩的柱子
+func get_pillar(semester string, score uint64) (s []string) {
+	s = []string{" " + semester + " ", "========"}
+	for i := 0; i < 20; i++ {
+		s = append(s, "        ")
+	}
+
+	i := 2
+	for ; i < int(score/5)+2; i++ {
+		s[i] = "   #    "
+	}
+	s[i] = "  " + strconv.Itoa(int(score)) + "分  "
+	fmt.Printf("i: %v\n", i)
+	return
+}
+
+//成绩分析
+func (student Student) Score_Analyse() {
+
+	//绘制成绩柱状图
+	semester_score_mapping := make(map[string]Score, 8)
+	for _, v := range SCORE_BUF {
+		if v.Num == student.Num {
+			semester_score_mapping[Semester_Mapping[v.Semester]] = v
+		}
+
+	}
+
+	//语文
+	s1 := get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chinese)
+	s2 := get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Chinese)
+	s3 := get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Chinese)
+	s4 := get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Chinese)
+	s5 := get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Chinese)
+	s6 := get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Chinese)
+	s7 := get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Chinese)
+	s8 := get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Chinese)
+	s9 := get_pillar("   语文     ", 0)
+	s9[2] = "        "
+	//数学
+	s10 := get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Math)
+	s11 := get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Math)
+	s12 := get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Math)
+	s13 := get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Math)
+	s14 := get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Math)
+	s15 := get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Math)
+	s16 := get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Math)
+	s17 := get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Math)
+	s18 := get_pillar("   数学     ", 0)
+
+	s18[2] = "        "
+	for i := len(s1) - 1; i >= 0; i-- {
+		fmt.Printf("%v%v%v%v%v%v%v%v%v  %v%v%v%v%v%v%v%v%v\n",
+			s1[i], s2[i], s3[i], s4[i], s5[i], s6[i], s7[i], s8[i], s9[i],
+			s10[i], s11[i], s12[i], s13[i], s14[i], s15[i], s16[i], s17[i], s18[i],
+		)
+	}
+	fmt.Printf("66666\n")
+
+}
+
 //更新
 func (student Student) Update() {}
 

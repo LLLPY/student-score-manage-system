@@ -51,6 +51,7 @@ func main() {
 				case "3":
 					user.Score_Pk()
 				case "4":
+					user.Score_Analyse()
 				case "0":
 					fmt.Printf("欢迎再次使用...\n")
 					os.Exit(0)
