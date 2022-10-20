@@ -53,7 +53,6 @@ func (score Score) Read_to_buffer(filename string) (err error) {
 		semester, _ := strconv.ParseUint(v_list[8], 10, 64)
 		tmp_score := Score{Num: num, Chinese: chinese, Math: math, English: english, Physical: physical, Chemistry: chemistry, Biology: biology, Sports: sports, Semester: semester}
 		SCORE_BUF = append(SCORE_BUF, tmp_score)
-		fmt.Printf("tmp_score: %v\n", tmp_score)
 	}
 	return nil
 }
@@ -83,7 +82,6 @@ func (student Student) Read_to_buffer(filename string) (err error) {
 				password := v_list[8]
 
 				STUDENT_BUF[num] = Student{Num: num, Name: name, Major: major, Class: class, Birthday: birthday, Gender: gender, Semester: semester, User_type: user_type, Password: password}
-				fmt.Printf("STUDENT_BUF[num]: %v\n", STUDENT_BUF[num])
 			}
 		}
 

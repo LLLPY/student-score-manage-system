@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-//管理者
+// 管理者
 type Manager struct {
 	num       string //职工号
 	name      string //姓名
@@ -17,7 +17,7 @@ type Manager struct {
 	password  string //密码
 }
 
-//将文件中的数据读到缓冲区，用的时候直接从缓冲区取，而不需要每次都从文件中读取
+// 将文件中的数据读到缓冲区，用的时候直接从缓冲区取，而不需要每次都从文件中读取
 func (manager Manager) Read_to_buffer(filename string) (err error) {
 
 	if len(MANAGER_BUF) == 0 {
@@ -38,7 +38,6 @@ func (manager Manager) Read_to_buffer(filename string) (err error) {
 				user_type, _ := strconv.ParseUint(v_list[4], 10, 64)
 				password := v_list[5]
 				MANAGER_BUF[num] = Manager{num: num, name: name, birthday: birthday, gender: gender, user_type: user_type, password: password}
-				fmt.Printf("MANAGER_BUF[num]: %v\n", MANAGER_BUF[num])
 			}
 		}
 
