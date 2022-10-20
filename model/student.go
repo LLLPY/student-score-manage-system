@@ -19,7 +19,7 @@ type Score struct {
 	Semester  uint64 //学期 1,2,3,4,5,6,7,8 从大一到大四总共8个学期
 }
 
-//学生
+// 学生
 type Student struct {
 	Num        string  //学号 学号的组成：年份 2022 编号 00001（00001到99999） 用户类型：1（1，2，3分别代表学生，教师和管理员）--》2022000011
 	Name       string  //姓名
@@ -33,7 +33,7 @@ type Student struct {
 	Score_list []Score //成绩列表
 }
 
-//将学生的成绩读取到缓冲
+// 将学生的成绩读取到缓冲
 func (score Score) Read_to_buffer(filename string) (err error) {
 	b, err2 := os.ReadFile(filename)
 	if err2 != nil {
@@ -58,7 +58,7 @@ func (score Score) Read_to_buffer(filename string) (err error) {
 	return nil
 }
 
-//将文件中的数据读到缓冲区，用的时候直接从缓冲区取，而不需要每次都从文件中读取
+// 将文件中的数据读到缓冲区，用的时候直接从缓冲区取，而不需要每次都从文件中读取
 func (student Student) Read_to_buffer(filename string) (err error) {
 
 	if len(STUDENT_BUF) == 0 {
@@ -94,20 +94,20 @@ func (student Student) Read_to_buffer(filename string) (err error) {
 
 }
 
-//登录
+// 登录
 func (student Student) Login(num string, password string) (ok bool) {
 	s, ok := STUDENT_BUF[num]
 	return s.Password == password
 }
 
-//登出
+// 登出
 func (student Student) Logout() (err error) {
 	student = Student{}
 
 	return nil
 }
 
-//显示个人信息
+// 显示个人信息
 func (student Student) Show_info() {
 	fmt.Printf("\n%-32v\n", "===================个人信息====================")
 	fmt.Printf("#   姓名：%-10v   学号：%-15s#\n", student.Name, student.Num)
@@ -120,13 +120,13 @@ func (student Student) Show_info() {
 	fmt.Scanln(&a)
 }
 
-//根据账号和密码获取一个学生
+// 根据账号和密码获取一个学生
 func Get_Student_By_Num(num string) (student *Student) {
 	*student = STUDENT_BUF[num]
 	return
 }
 
-//新增
+// 新增
 func (student Student) Create() (err error) {
 	var num, name, major, class, birthday, password string
 	var gender, semester, major_choice uint64
@@ -178,7 +178,7 @@ func (student Student) Create() (err error) {
 	return nil
 }
 
-//查找学生成绩
+// 查找学生成绩
 func (student Student) Find() {
 	var num, name, find_choice string
 
@@ -220,7 +220,7 @@ func (student Student) Find() {
 
 }
 
-//根据学号查找
+// 根据学号查找
 func Find_by_Num(num string) (score_list []Score) {
 
 	for _, v := range SCORE_BUF {
@@ -231,7 +231,7 @@ func Find_by_Num(num string) (score_list []Score) {
 	return
 }
 
-//根据姓名查找
+// 根据姓名查找
 func Find_by_Name(name string) (score_list []Score) {
 
 	for _, v := range SCORE_BUF {
@@ -242,7 +242,7 @@ func Find_by_Name(name string) (score_list []Score) {
 	return
 }
 
-//成绩PK
+// 成绩PK
 func (student Student) Score_Pk() {
 
 	n := 1
@@ -298,7 +298,7 @@ func (student Student) Score_Pk() {
 
 }
 
-//成绩比较的功能封装
+// 成绩比较的功能封装
 func Pk_Part(course string, score1 uint64, score2 uint64, full_score uint64, flag string) {
 
 	per1 := float64(float64(score1) / float64(full_score))
@@ -338,7 +338,7 @@ func Pk_Part(course string, score1 uint64, score2 uint64, full_score uint64, fla
 		}
 
 	}
-	var tmp_per int = int(per)
+	var tmp_per float64 = per
 	if per > 1 {
 		tmp_per = 1 //占比可能超过100%
 	}
@@ -353,7 +353,7 @@ func Pk_Part(course string, score1 uint64, score2 uint64, full_score uint64, fla
 	fmt.Printf("%.2f%%  占比(%.2f%%),%v!\n\n", per*100, per*100, flag)
 }
 
-//成绩PK
+// 成绩PK
 func Pk(course string, score1 uint64, score2 uint64, full_score uint64) {
 	if score1 > score2 {
 		Pk_Part(course, score1, score2, full_score, "完胜")
@@ -367,23 +367,30 @@ func Pk(course string, score1 uint64, score2 uint64, full_score uint64) {
 	}
 }
 
-//获取每一个成绩的柱子
-func get_pillar(semester string, score uint64) (s []string) {
+// 获取每一个成绩的柱子
+func get_pillar(semester string, score uint64, subject string) (s []string) {
+
 	s = []string{" " + semester + " ", "========"}
 	for i := 0; i < 20; i++ {
 		s = append(s, "        ")
 	}
 
+	if subject == "总分" {
+		score /= 7
+	}
+	fmt.Printf("score: %v\n", score)
 	i := 2
 	for ; i < int(score/5)+2; i++ {
 		s[i] = "   #    "
 	}
+	if subject == "总分" {
+		score *= 7
+	}
 	s[i] = "  " + strconv.Itoa(int(score)) + "分  "
-	fmt.Printf("i: %v\n", i)
 	return
 }
 
-//成绩分析
+// 成绩分析
 func (student Student) Score_Analyse() {
 
 	//绘制成绩柱状图
@@ -394,49 +401,129 @@ func (student Student) Score_Analyse() {
 		}
 
 	}
+	var subject_choice int
+	var s1, s2, s3, s4, s5, s6, s7, s8, s9 []string
+	fmt.Printf("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:")
+	fmt.Scanln(&subject_choice)
+	switch subject_choice {
+	case 1: //语文
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chinese, "语文")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Chinese, "语文")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Chinese, "语文")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Chinese, "语文")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Chinese, "语文")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Chinese, "语文")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Chinese, "语文")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Chinese, "语文")
+		s9 = get_pillar("   语文     ", 0, "语文")
+	case 2:
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Math, "数学")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Math, "数学")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Math, "数学")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Math, "数学")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Math, "数学")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Math, "数学")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Math, "数学")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Math, "数学")
+		s9 = get_pillar("   数学     ", 0, "数学")
+	case 3:
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].English, "英语")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].English, "英语")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].English, "英语")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].English, "英语")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].English, "英语")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].English, "英语")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].English, "英语")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].English, "英语")
+		s9 = get_pillar("   英语     ", 0, "英语")
+	case 4:
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Physical, "物理")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Physical, "物理")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Physical, "物理")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Physical, "物理")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Physical, "物理")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Physical, "物理")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Physical, "物理")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Physical, "物理")
+		s9 = get_pillar("   物理     ", 0, "物理")
+	case 5:
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chemistry, "化学")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Chemistry, "化学")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Chemistry, "化学")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Chemistry, "化学")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Chemistry, "化学")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Chemistry, "化学")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Chemistry, "化学")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Chemistry, "化学")
+		s9 = get_pillar("   化学     ", 0, "化学")
+	case 6:
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Biology, "生物")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Biology, "生物")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Biology, "生物")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Biology, "生物")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Biology, "生物")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Biology, "生物")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Biology, "生物")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Biology, "生物")
+		s9 = get_pillar("   生物     ", 0, "生物")
+	case 7:
+		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Sports, "体育")
+		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Sports, "体育")
+		s3 = get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Sports, "体育")
+		s4 = get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Sports, "体育")
+		s5 = get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Sports, "体育")
+		s6 = get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Sports, "体育")
+		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Sports, "体育")
+		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Sports, "体育")
+		s9 = get_pillar("   体育     ", 0, "体育")
+	case 8:
+		var score_obj Score
+		score_obj = semester_score_mapping[Semester_List[0]]
+		s1 = get_pillar(Semester_List[0], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
 
-	//语文
-	s1 := get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chinese)
-	s2 := get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Chinese)
-	s3 := get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Chinese)
-	s4 := get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Chinese)
-	s5 := get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Chinese)
-	s6 := get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Chinese)
-	s7 := get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Chinese)
-	s8 := get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Chinese)
-	s9 := get_pillar("   语文     ", 0)
+		score_obj = semester_score_mapping[Semester_List[1]]
+		s2 = get_pillar(Semester_List[1], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		score_obj = semester_score_mapping[Semester_List[2]]
+		s3 = get_pillar(Semester_List[2], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		score_obj = semester_score_mapping[Semester_List[3]]
+		s4 = get_pillar(Semester_List[3], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		score_obj = semester_score_mapping[Semester_List[4]]
+		s5 = get_pillar(Semester_List[4], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		score_obj = semester_score_mapping[Semester_List[5]]
+		s6 = get_pillar(Semester_List[5], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		score_obj = semester_score_mapping[Semester_List[6]]
+		s7 = get_pillar(Semester_List[6], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		score_obj = semester_score_mapping[Semester_List[7]]
+		s8 = get_pillar(Semester_List[7], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
+
+		s9 = get_pillar("   总分     ", 0, "总分")
+	}
 	s9[2] = "        "
-	//数学
-	s10 := get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Math)
-	s11 := get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Math)
-	s12 := get_pillar(Semester_List[2], semester_score_mapping[Semester_List[2]].Math)
-	s13 := get_pillar(Semester_List[3], semester_score_mapping[Semester_List[3]].Math)
-	s14 := get_pillar(Semester_List[4], semester_score_mapping[Semester_List[4]].Math)
-	s15 := get_pillar(Semester_List[5], semester_score_mapping[Semester_List[5]].Math)
-	s16 := get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Math)
-	s17 := get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Math)
-	s18 := get_pillar("   数学     ", 0)
-
-	s18[2] = "        "
+	fmt.Printf("\n")
 	for i := len(s1) - 1; i >= 0; i-- {
-		fmt.Printf("%v%v%v%v%v%v%v%v%v  %v%v%v%v%v%v%v%v%v\n",
+		fmt.Printf("%v%v%v%v%v%v%v%v%v\n",
 			s1[i], s2[i], s3[i], s4[i], s5[i], s6[i], s7[i], s8[i], s9[i],
-			s10[i], s11[i], s12[i], s13[i], s14[i], s15[i], s16[i], s17[i], s18[i],
 		)
 	}
-	fmt.Printf("66666\n")
+	fmt.Printf("\n")
 
 }
 
-//更新
+// 更新
 func (student Student) Update() {}
 
-//更新学生信息
+// 更新学生信息
 func (student *Student) Update_info(name string, major string, class string, birthday string, gender uint64, grade uint64, password string, score_list []Score) {
 
 }
 
-//删除
+// 删除
 func (student Student) Delete() (err error) {
 	//删除STUDENT_BUF中的内容
 	delete(STUDENT_BUF, student.Num)
