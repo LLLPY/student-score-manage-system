@@ -205,9 +205,9 @@ func (student Student) Find() {
 	if len(score_list) < 1 {
 		fmt.Printf("\n无相关内容...\n")
 	} else {
-		fmt.Printf("\n%-6v%-10v%-3v%-3v%-3v%-3v%-3v%-3v%-3v\n", "姓名", "学号", "语文", "数学", "英语", "物理", "生物", "化学", "体育")
+		fmt.Printf("\n%-6v%-10v%-3v%-3v%-3v%-3v%-3v%-3v%-3v%-3v\n", "姓名", "学号", "语文", "数学", "英语", "物理", "生物", "化学", "体育", "学期")
 		for _, v := range score_list {
-			fmt.Printf("%-6v%-12v%-5v%-5v%-5v%-5v%-5v%-5v%-5v\n", STUDENT_BUF[v.Num].Name, v.Num, v.Chinese, v.Math, v.English, v.Physical, v.Biology, v.Chemistry, v.Sports)
+			fmt.Printf("%-6v%-12v%-5v%-5v%-5v%-5v%-5v%-5v%-5v%-5v\n", STUDENT_BUF[v.Num].Name, v.Num, v.Chinese, v.Math, v.English, v.Physical, v.Biology, v.Chemistry, v.Sports, Semester_Mapping[v.Semester])
 
 		}
 		fmt.Printf("\n")
