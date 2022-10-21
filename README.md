@@ -1,7 +1,8 @@
 
 # 基于go语言的史上最流弊的学生成绩管理系统
 
-![输入图片说明](imgsimage.png)
+![输入图片说明](imgs/image.png)
+![输入图片说明](imgs/image.png)
 
 ## 简介
 
