@@ -107,12 +107,20 @@ func (student Student) Logout() (err error) {
 
 // 显示个人信息
 func (student Student) Show_info() {
-	fmt.Printf("\n%-32v\n", "===================个人信息====================")
-	fmt.Printf("#   姓名：%-10v   学号：%-15s#\n", student.Name, student.Num)
-	fmt.Printf("#   专业：%-10v班级：%-15s#\n", student.Major, student.Class)
-	fmt.Printf("#   年级：%-10v  用户类型：%-9s#\n", Semester_Mapping[student.Semester], User_Type_Mapping[student.User_type])
-	fmt.Printf("#   性别：%-10v    出生日期：%-11s#\n", Gender_Mapping[student.Gender], student.Birthday)
-	fmt.Printf("===============================================\n")
+	name := student.Name
+	num := student.Num
+	major := student.Major
+	class := student.Class
+	semester := Semester_Mapping[student.Semester]
+	user_type := User_Type_Mapping[student.User_type]
+	gender := Gender_Mapping[student.Gender]
+	birthday := student.Birthday
+	fmt.Printf("\n===================个人信息===================\n")
+	fmt.Printf("#   %s%s%-20s\n", "姓名："+name, strings.Repeat("　", (12-len([]byte(name)))/3), "学号："+num)
+	fmt.Printf("#   %s%s%-20s\n", "专业："+major, strings.Repeat("　", (12-len([]byte(major)))/3), "班级："+class)
+	fmt.Printf("#   %s%s%-20s\n", "年级："+semester, strings.Repeat("　", (12-len([]byte(semester)))/3), "用户类型："+user_type)
+	fmt.Printf("#   %s%s%-20s\n", "性别："+gender, strings.Repeat("　", (12-len([]byte(gender)))/3), "出生日期："+birthday)
+	fmt.Printf("==============================================\n")
 	var a string
 	fmt.Println("按任意键继续...")
 	fmt.Scanln(&a)
@@ -205,9 +213,9 @@ func (student Student) Find() {
 	if len(score_list) < 1 {
 		fmt.Printf("\n无相关内容...\n")
 	} else {
-		fmt.Printf("\n%-6v%-10v%-3v%-3v%-3v%-3v%-3v%-3v%-3v%-3v\n", "姓名", "学号", "语文", "数学", "英语", "物理", "生物", "化学", "体育", "学期")
+		fmt.Printf("\n%-10v%-14v%-3v%-3v%-3v%-3v%-3v%-3v%-3v%-3v\n", "姓名", "学号", "语文", "数学", "英语", "物理", "生物", "化学", "体育", "学期")
 		for _, v := range score_list {
-			fmt.Printf("%-6v%-12v%-5v%-5v%-5v%-5v%-5v%-5v%-5v%-5v\n", STUDENT_BUF[v.Num].Name, v.Num, v.Chinese, v.Math, v.English, v.Physical, v.Biology, v.Chemistry, v.Sports, Semester_Mapping[v.Semester])
+			fmt.Printf("%-10v%-14v%-5v%-5v%-5v%-5v%-5v%-5v%-5v%-5v\n", STUDENT_BUF[v.Num].Name, v.Num, v.Chinese, v.Math, v.English, v.Physical, v.Biology, v.Chemistry, v.Sports, Semester_Mapping[v.Semester])
 
 		}
 		fmt.Printf("\n")
