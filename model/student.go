@@ -254,12 +254,15 @@ func (student Student) Score_Pk() {
 	n := 1
 	n_num_mapping := make(map[int]string, len(STUDENT_BUF))
 	for k, v := range STUDENT_BUF {
-		fmt.Printf("(%v.%v)  ", n, v.Name)
-		if n%8 == 0 {
-			fmt.Printf("\n")
+		if student.Major == v.Major { //同一个专业的才能比较
+			fmt.Printf("(%v.%v)  ", n, v.Name)
+			if n%8 == 0 {
+				fmt.Printf("\n")
+			}
+			n_num_mapping[n] = k
+			n += 1
 		}
-		n_num_mapping[n] = k
-		n += 1
+
 	}
 	fmt.Printf("\n请选择要进行PK的同学：")
 	fmt.Scanln(&n)
@@ -384,7 +387,6 @@ func get_pillar(semester string, score uint64, subject string) (s []string) {
 	if subject == "总分" {
 		score /= 7
 	}
-	fmt.Printf("score: %v\n", score)
 	i := 2
 	for ; i < int(score/5)+2; i++ {
 		s[i] = "   #    "
