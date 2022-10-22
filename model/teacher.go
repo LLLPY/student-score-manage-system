@@ -9,13 +9,14 @@ import (
 
 // 老师
 type Teacher struct {
-	num       string //职工号
-	name      string //姓名
-	major     string //专业
-	birthday  string //出生日期
-	gender    uint64 //性别 0：男 1：女
-	user_type uint64 //用户类型 1：学生 2：教师 3：管理员
-	password  string //密码
+	num        string //职工号
+	name       string //姓名
+	major      string //专业
+	birthday   string //出生日期
+	gender     uint64 //性别 0：男 1：女
+	user_type  uint64 //用户类型 1：学生 2：教师 3：管理员
+	password   string //密码
+	class_list string //管理的班级
 
 }
 

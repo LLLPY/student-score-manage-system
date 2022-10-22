@@ -23,14 +23,14 @@ func init() {
 
 func main() {
 
-	// number, password, err := template.Login_menu()
+	number, password, err := template.Login_menu()
 
-	// if err == nil {
-	// 	fmt.Printf("number: %v\n", number)
-	// 	fmt.Printf("password: %v\n", password)
-	// }
-	number := "2022000011"
-	password := "1234"
+	if err == nil {
+		fmt.Printf("number: %v\n", number)
+		fmt.Printf("password: %v\n", password)
+	}
+	// number := "2022000011"
+	// password := "1234"
 	// var user model.User
 	// var user model.User
 	user_type := string(number[len(number)-1])

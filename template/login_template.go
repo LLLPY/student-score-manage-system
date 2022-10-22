@@ -12,8 +12,8 @@ func Login_menu() (number string, password string, tmp_err error) {
 	fmt.Printf("%-32v\n", "#    <<学 生 成 绩 管 理 系 统>>   #")
 	fmt.Printf("%-32v\n", "#   student-score-manage-system    #")
 	fmt.Printf("%-32v\n", "#                                  #")
-	fmt.Printf("%-32v\n", "#                                  #")
-	fmt.Printf("%-32v\n", "#                          V 1.0   #")
+	fmt.Printf("%-32v\n", "#     🐹🐹🐹               V 1.0   #")
+	fmt.Printf("%-32v\n", "#   2022-10-12     powered by go   #")
 	fmt.Printf("%-32v\n", "===================================")
 
 	print("请输入账号(学号/教职工号/管理员账号)：")

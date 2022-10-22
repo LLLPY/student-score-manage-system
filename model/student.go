@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// 成绩
 type Score struct {
 	Num       string //学号
 	Chinese   uint64 //语文
@@ -280,11 +281,11 @@ func (student Student) Score_Pk() {
 	var self_score, other_score Score
 	var flag int = 0
 	for _, v := range SCORE_BUF {
-		if v.Num == student.Num && v.Semester == uint64(semester_choice) {
+		if v.Num == student.Num && v.Semester == uint64(semester_choice) { //找出自己的成绩
 			self_score = v
 			flag++
 		}
-		if v.Num == n_num_mapping[n] && v.Semester == uint64(semester_choice) {
+		if v.Num == n_num_mapping[n] && STUDENT_BUF[v.Num].Major == student.Major && v.Semester == uint64(semester_choice) { //同专业，同年级的才能进行比较
 			other_score = v
 			flag++
 		}
