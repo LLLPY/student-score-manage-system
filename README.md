@@ -6,9 +6,11 @@
 
 ## 简介
 
-<img src="/home/lll/snap/typora/76/.config/Typora/typora-user-images/image-20221022231136368.png" alt="image-20221022231136368" style="zoom: 200%;" />
 
-![image-20221022210149817](/home/lll/snap/typora/76/.config/Typora/typora-user-images/image-20221022210149817.png)
+
+<img src="imgs/image-20221022232831028.png" alt="image-20221022232831028" style="zoom:200%;" />
+
+
 
 
 
