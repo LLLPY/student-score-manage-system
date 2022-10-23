@@ -5,7 +5,7 @@ import (
 )
 
 //学生登录后看到的主菜单
-func Student_main_menu() (choice string) {
+func Student_main_menu() (choice int) {
 
 	fmt.Printf("================\n")
 	fmt.Printf("1.查看个人信息\n")

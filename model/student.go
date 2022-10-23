@@ -5,19 +5,20 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"student-score-manage-system/utils"
 )
 
 // 成绩
 type Score struct {
 	Num       string //学号
-	Chinese   uint64 //语文
-	Math      uint64 //数学
-	English   uint64 //英语
-	Physical  uint64 //物理
-	Chemistry uint64 //化学
-	Biology   uint64 //生物
-	Sports    uint64 //体育
-	Semester  uint64 //学期 1,2,3,4,5,6,7,8 从大一到大四总共8个学期
+	Chinese   int    //语文
+	Math      int    //数学
+	English   int    //英语
+	Physical  int    //物理
+	Chemistry int    //化学
+	Biology   int    //生物
+	Sports    int    //体育
+	Semester  int    //学期 1,2,3,4,5,6,7,8 从大一到大四总共8个学期
 }
 
 // 学生
@@ -27,9 +28,9 @@ type Student struct {
 	Major      string  //专业
 	Class      string  //班级
 	Birthday   string  //出生日期
-	Gender     uint64  //性别 0：男 1：女
-	Semester   uint64  //年级 1：大一 2：大二 3：大三 4：大四
-	User_type  uint64  //用户类型 1：学生 2：教师 3：管理员
+	Gender     int     //性别 0：男 1：女
+	Semester   int     //年级 1：大一 2：大二 3：大三 4：大四
+	User_type  int     //用户类型 1：学生 2：教师 3：管理员
 	Password   string  //密码
 	Score_list []Score //成绩列表
 }
@@ -44,14 +45,14 @@ func (score Score) Read_to_buffer(filename string) (err error) {
 	for _, v := range data_list {
 		v_list := strings.Split(v, ",")
 		num := v_list[0]
-		chinese, _ := strconv.ParseUint(v_list[1], 10, 64)
-		math, _ := strconv.ParseUint(v_list[2], 10, 64)
-		english, _ := strconv.ParseUint(v_list[3], 10, 64)
-		physical, _ := strconv.ParseUint(v_list[4], 10, 64)
-		chemistry, _ := strconv.ParseUint(v_list[5], 10, 64)
-		biology, _ := strconv.ParseUint(v_list[6], 10, 64)
-		sports, _ := strconv.ParseUint(v_list[7], 10, 64)
-		semester, _ := strconv.ParseUint(v_list[8], 10, 64)
+		chinese, _ := strconv.Atoi(v_list[1])
+		math, _ := strconv.Atoi(v_list[2])
+		english, _ := strconv.Atoi(v_list[3])
+		physical, _ := strconv.Atoi(v_list[4])
+		chemistry, _ := strconv.Atoi(v_list[5])
+		biology, _ := strconv.Atoi(v_list[6])
+		sports, _ := strconv.Atoi(v_list[7])
+		semester, _ := strconv.Atoi(v_list[8])
 		tmp_score := Score{Num: num, Chinese: chinese, Math: math, English: english, Physical: physical, Chemistry: chemistry, Biology: biology, Sports: sports, Semester: semester}
 		SCORE_BUF = append(SCORE_BUF, tmp_score)
 	}
@@ -77,9 +78,9 @@ func (student Student) Read_to_buffer(filename string) (err error) {
 				major := v_list[2]
 				class := v_list[3]
 				birthday := v_list[4]
-				gender, _ := strconv.ParseUint(v_list[5], 10, 64)
-				semester, _ := strconv.ParseUint(v_list[6], 10, 64)
-				user_type, _ := strconv.ParseUint(v_list[7], 10, 64)
+				gender, _ := strconv.Atoi(v_list[5])
+				semester, _ := strconv.Atoi(v_list[6])
+				user_type, _ := strconv.Atoi(v_list[7])
 				password := v_list[8]
 
 				STUDENT_BUF[num] = Student{Num: num, Name: name, Major: major, Class: class, Birthday: birthday, Gender: gender, Semester: semester, User_type: user_type, Password: password}
@@ -91,19 +92,6 @@ func (student Student) Read_to_buffer(filename string) (err error) {
 	// print("没有读文件")
 	return nil
 
-}
-
-// 登录
-func (student Student) Login(num string, password string) (ok bool) {
-	s, ok := STUDENT_BUF[num]
-	return s.Password == password
-}
-
-// 登出
-func (student Student) Logout() (err error) {
-	student = Student{}
-
-	return nil
 }
 
 // 显示个人信息
@@ -122,77 +110,73 @@ func (student Student) Show_info() {
 	fmt.Printf("#   %s%s%-20s\n", "年级："+semester, strings.Repeat("　", (12-len([]byte(semester)))/3), "用户类型："+user_type)
 	fmt.Printf("#   %s%s%-20s\n", "性别："+gender, strings.Repeat("　", (12-len([]byte(gender)))/3), "出生日期："+birthday)
 	fmt.Printf("==============================================\n")
-	var a string
-	fmt.Println("按任意键继续...")
-	fmt.Scanln(&a)
+	utils.Legal_input_string("按任意键继续...", map[string]string{})
 }
 
-// 根据账号和密码获取一个学生
-func Get_Student_By_Num(num string) (student *Student) {
-	*student = STUDENT_BUF[num]
-	return
+// 登录
+func (student Student) Login(num string, password string) (ok bool) {
+	s, ok := STUDENT_BUF[num]
+	return s.Password == password
 }
 
-// 新增
-func (student Student) Create() (err error) {
-	var num, name, major, class, birthday, password string
-	var gender, semester, major_choice uint64
-	//姓名
-	fmt.Print("请输入学号：")
-	fmt.Scanln(&num)
-	_, ok := STUDENT_BUF[num]
-	if ok {
-		fmt.Printf("该学号已存在！")
-		return
-	}
-	fmt.Print("请输入姓名：")
-	fmt.Scanln(&name)
-	for i := 0; i < len(Major_Mapping); i++ {
-		print(strconv.Itoa(i+1) + "." + Major_Mapping[uint64(i+1)] + "  ")
-	}
-	fmt.Printf("\n请输入专业：")
-	fmt.Scanln(&major_choice)
-	major = Major_Mapping[major_choice]
-	fmt.Print("请输入班级：")
-	fmt.Scanln(&class)
-	fmt.Print("请输入生日：")
-	fmt.Scanln(&birthday)
-	for i := 0; i < len(Gender_Mapping); i++ {
-		print(strconv.Itoa(i+1) + "." + Gender_Mapping[uint64(i)] + "  ")
+// 登出
+func (student Student) Logout() (err error) {
+	student = Student{}
 
-	}
-	fmt.Print("\n请输入性别：")
-	fmt.Scanln(&gender)
-	gender--
-	for i := 0; i < len(Semester_Mapping); i++ {
-		print(strconv.Itoa(i+1) + "." + Semester_Mapping[uint64(i+1)] + "  ")
-
-	}
-	fmt.Print("\n请输入学期：")
-	fmt.Scanln(&semester)
-	fmt.Print("请输入密码：")
-	fmt.Scanln(&password)
-	s := Student{}
-	s.Name = name
-	s.Num = num
-	s.Major = major
-	s.Class = class
-	s.Birthday = birthday
-	s.Gender = gender
-	s.Semester = semester
-	s.Password = password
-	STUDENT_BUF[num] = s
 	return nil
+}
+
+func Show_score_list(score_list []Score) {
+	if len(score_list) < 1 {
+		fmt.Printf("\n无相关内容...\n")
+	} else {
+		fmt.Printf("\n%-s%-s%-s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-s\n",
+			"姓名", strings.Repeat("　", (18-len([]byte("姓名")))/3),
+			"学号", strings.Repeat("　", (18-len([]byte("学号")))/3),
+			"语文", strings.Repeat("　", (12-len([]byte("语文")))/3),
+			"数学", strings.Repeat("　", (12-len([]byte("数学")))/3),
+			"英语", strings.Repeat("　", (12-len([]byte("英语")))/3),
+			"物理", strings.Repeat("　", (12-len([]byte("物理")))/3),
+			"生物", strings.Repeat("　", (12-len([]byte("生物")))/3),
+			"化学", strings.Repeat("　", (12-len([]byte("化学")))/3),
+			"体育", strings.Repeat("　", (12-len([]byte("体育")))/3),
+			"总分", strings.Repeat("　", (12-len([]byte("总分")))/3),
+			"学期")
+		for _, v := range score_list {
+			name := STUDENT_BUF[v.Num].Name
+			semester := Semester_Mapping[v.Semester]
+			sum := strconv.Itoa(v.Chinese + v.Math + v.English + v.Physical + v.Chemistry + v.Biology + v.Sports)
+			chinese := strconv.Itoa(v.Chinese)
+			math := strconv.Itoa(v.Math)
+			english := strconv.Itoa(v.English)
+			physical := strconv.Itoa(v.Physical)
+			biology := strconv.Itoa(v.Biology)
+			chemistry := strconv.Itoa(v.Chemistry)
+			sports := strconv.Itoa(v.Sports)
+			fmt.Printf("%-s%-s%-s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-6s%-s%-s\n",
+				name, strings.Repeat("　", (18-len([]byte(name)))/3),
+				v.Num, strings.Repeat("　", (18-len([]byte(v.Num)))/3),
+				chinese, strings.Repeat("　", (12-len([]byte(chinese)))/3),
+				math, strings.Repeat("　", (12-len([]byte(math)))/3),
+				english, strings.Repeat("　", (12-len([]byte(english)))/3),
+				physical, strings.Repeat("　", (12-len([]byte(physical)))/3),
+				chemistry, strings.Repeat("　", (12-len([]byte(chemistry)))/3),
+				biology, strings.Repeat("　", (12-len([]byte(biology)))/3),
+				sports, strings.Repeat("　", (12-len([]byte(sports)))/3),
+				sum, strings.Repeat("　", (12-len([]byte(sum)))/3),
+				semester,
+			)
+
+		}
+		fmt.Printf("\n")
+	}
 }
 
 // 查找学生成绩
 func (student Student) Find() {
-	var num, name, find_choice string
-
-	fmt.Printf("\n1.学号查找 other.姓名查找\n")
-	fmt.Printf("请选择查找方式：")
-	fmt.Scanln(&find_choice)
-	if find_choice == "1" {
+	var num, name string
+	find_choice := utils.Legal_input_int("\n1.学号查找 2.姓名查找\n请选择查询方式:", map[int]string{1: "学号", 2: "姓名"})
+	if find_choice == 1 {
 		fmt.Printf("请输入学号：")
 		fmt.Scanln(&num)
 	} else {
@@ -210,20 +194,10 @@ func (student Student) Find() {
 		fmt.Printf("\n姓名：%v\n", name)
 
 	}
+	//显示学生成绩
+	Show_score_list(score_list)
 
-	if len(score_list) < 1 {
-		fmt.Printf("\n无相关内容...\n")
-	} else {
-		fmt.Printf("\n%-10v%-14v%-3v%-3v%-3v%-3v%-3v%-3v%-3v%-3v\n", "姓名", "学号", "语文", "数学", "英语", "物理", "生物", "化学", "体育", "学期")
-		for _, v := range score_list {
-			fmt.Printf("%-10v%-14v%-5v%-5v%-5v%-5v%-5v%-5v%-5v%-5v\n", STUDENT_BUF[v.Num].Name, v.Num, v.Chinese, v.Math, v.English, v.Physical, v.Biology, v.Chemistry, v.Sports, Semester_Mapping[v.Semester])
-
-		}
-		fmt.Printf("\n")
-	}
-	var a string
-	fmt.Println("按任意键继续...")
-	fmt.Scanln(&a)
+	utils.Legal_input_string("按任意键继续...", map[string]string{})
 
 }
 
@@ -253,7 +227,8 @@ func Find_by_Name(name string) (score_list []Score) {
 func (student Student) Score_Pk() {
 
 	n := 1
-	n_num_mapping := make(map[int]string, len(STUDENT_BUF))
+	n_num_mapping := make(map[int]string)
+	n_name_mapping := make(map[int]string)
 	for k, v := range STUDENT_BUF {
 		if student.Major == v.Major { //同一个专业的才能比较
 			fmt.Printf("(%v.%v)  ", n, v.Name)
@@ -261,31 +236,31 @@ func (student Student) Score_Pk() {
 				fmt.Printf("\n")
 			}
 			n_num_mapping[n] = k
+			n_name_mapping[n] = v.Name
 			n += 1
 		}
 
 	}
-	fmt.Printf("\n请选择要进行PK的同学：")
-	fmt.Scanln(&n)
+	n = utils.Legal_input_int("\n请选择要进行PK的同学：", n_name_mapping)
 
 	semester_choice := 1
 
 	for i := 1; i <= 8; i++ {
-		fmt.Printf("(%v.%v)  ", i, Semester_Mapping[uint64(i)])
+		fmt.Printf("(%v.%v)  ", i, Semester_Mapping[i])
 
 	}
-	fmt.Printf("\n请选择学期：")
-	fmt.Scanln(&semester_choice)
+
+	semester_choice = utils.Legal_input_int("\n请选择学期：", Semester_Mapping)
 	fmt.Printf("\n")
 	//找出自己和要PK的同学对应学期的成绩
 	var self_score, other_score Score
 	var flag int = 0
 	for _, v := range SCORE_BUF {
-		if v.Num == student.Num && v.Semester == uint64(semester_choice) { //找出自己的成绩
+		if v.Num == student.Num && v.Semester == semester_choice { //找出自己的成绩
 			self_score = v
 			flag++
 		}
-		if v.Num == n_num_mapping[n] && STUDENT_BUF[v.Num].Major == student.Major && v.Semester == uint64(semester_choice) { //同专业，同年级的才能进行比较
+		if v.Num == n_num_mapping[n] && STUDENT_BUF[v.Num].Major == student.Major && v.Semester == semester_choice { //同专业，同年级的才能进行比较
 			other_score = v
 			flag++
 		}
@@ -309,7 +284,7 @@ func (student Student) Score_Pk() {
 }
 
 // 成绩比较的功能封装
-func Pk_Part(course string, score1 uint64, score2 uint64, full_score uint64, flag string) {
+func Pk_Part(course string, score1 int, score2 int, full_score int, flag string) {
 
 	per1 := float64(float64(score1) / float64(full_score))
 	per2 := float64(float64(score2) / float64(full_score))
@@ -364,7 +339,7 @@ func Pk_Part(course string, score1 uint64, score2 uint64, full_score uint64, fla
 }
 
 // 成绩PK
-func Pk(course string, score1 uint64, score2 uint64, full_score uint64) {
+func Pk(course string, score1 int, score2 int, full_score int) {
 	if score1 > score2 {
 		Pk_Part(course, score1, score2, full_score, "完胜")
 
@@ -378,7 +353,7 @@ func Pk(course string, score1 uint64, score2 uint64, full_score uint64) {
 }
 
 // 获取每一个成绩的柱子
-func get_pillar(semester string, score uint64, subject string) (s []string) {
+func get_pillar(semester string, score int, subject string) (s []string) {
 
 	s = []string{" " + semester + " ", "========"}
 	for i := 0; i < 20; i++ {
@@ -412,8 +387,8 @@ func (student Student) Score_Analyse() {
 	}
 	var subject_choice int
 	var s1, s2, s3, s4, s5, s6, s7, s8, s9 []string
-	fmt.Printf("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:")
-	fmt.Scanln(&subject_choice)
+
+	subject_choice = utils.Legal_input_int("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:", map[int]string{1: "语文", 2: "数学", 3: "英语", 4: "物理", 5: "化学", 6: "生物", 7: "体育", 8: "总分"})
 	switch subject_choice {
 	case 1: //语文
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chinese, "语文")
@@ -514,6 +489,8 @@ func (student Student) Score_Analyse() {
 		s9 = get_pillar("   总分     ", 0, "总分")
 	}
 	s9[2] = "        "
+
+	//打印柱状图
 	fmt.Printf("\n")
 	for i := len(s1) - 1; i >= 0; i-- {
 		fmt.Printf("%v%v%v%v%v%v%v%v%v\n",
@@ -521,30 +498,5 @@ func (student Student) Score_Analyse() {
 		)
 	}
 	fmt.Printf("\n")
-
-}
-
-// 更新
-func (student Student) Update() {}
-
-// 更新学生信息
-func (student *Student) Update_info(name string, major string, class string, birthday string, gender uint64, grade uint64, password string, score_list []Score) {
-
-}
-
-// 删除
-func (student Student) Delete() (err error) {
-	//删除STUDENT_BUF中的内容
-	delete(STUDENT_BUF, student.Num)
-
-	//删除SCORE_BUF中的内容
-	for i := 0; i < len(SCORE_BUF); i++ {
-		if SCORE_BUF[i].Num == student.Num {
-			SCORE_BUF = append(SCORE_BUF[:i], SCORE_BUF[i+1:]...)
-			i--
-		}
-
-	}
-	return nil
 
 }

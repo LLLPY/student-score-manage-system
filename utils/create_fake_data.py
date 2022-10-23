@@ -27,11 +27,13 @@ class_set = {
     '11906',
 }
 # 创建学生的数据
+
+
 def create_student_info_data(n=100):
 
-    with open('student.txt', 'w', encoding='utf8') as f_student,open('score.txt','w',encoding='utf8') as f_score:
-        student_data=''
-        score_data=''
+    with open('../model/data/student.txt', 'w', encoding='utf8') as f_student, open('../model/data/score.txt', 'w', encoding='utf8') as f_score:
+        student_data = ''
+        score_data = ''
         start = 202200001
         for i in range(start, start+n):
             user_type = 1
@@ -40,35 +42,54 @@ def create_student_info_data(n=100):
             major = choice(list(major_set))
             class_ = choice(list(class_set))
             birthday = str(datetime.fromtimestamp(
-                    time()-randint(0, 4*365*24*60*60))).split(' ')[0]
+                time()-randint(0, 4*365*24*60*60))).split(' ')[0]
             gender = choice(list(range(2)))
             password = '1234'
             for semester in range(1, 9):
-                score='{},'.format(num)+','.join(map(str,create_score_data()))
-                score_data+=f'{score},{semester}\n'
+                score = '{},'.format(
+                    num)+','.join(map(str, create_score_data()))
+                score_data += f'{score},{semester}\n'
                 student = f'{num},{name},{major},{class_},{birthday},{gender},{semester},{user_type},{password}\n'
                 # print(student)
-                
-                student_data+=student
-        f_student.write(student_data[:-1]) #去掉最后一个换行
+
+                student_data += student
+        f_student.write(student_data[:-1])  # 去掉最后一个换行
         f_score.write(score_data[:-1])
-                
 
 
-#创建分数数据
+# 创建分数数据
 def create_score_data():
-    chinese=randint(50,100)
-    math=randint(60,100)
-    english=randint(30,100)
-    physical=randint(30,100)
-    chemistry=randint(50,100)
-    biology=randint(60,100)
-    sports=randint(80,100)
-    return [chinese,math,english,physical,chemistry,biology,sports]
-    
+    chinese = randint(50, 100)
+    math = randint(60, 100)
+    english = randint(30, 100)
+    physical = randint(30, 100)
+    chemistry = randint(50, 100)
+    biology = randint(60, 100)
+    sports = randint(80, 100)
+    return [chinese, math, english, physical, chemistry, biology, sports]
 
 
+# 创建老师的数据
+def create_teacher_info_data(n=10):
+    with open('../model/data/teacher.txt', 'w', encoding='utf8') as f:
+        teacher_data = ''
+        user_type = 2
+        start = 202200001
+        for i in range(start, start+n):
+            num = f'{i}{user_type}'
+            name = ''.join(choices(list(name_set), k=randint(2, 3)))
+            major = choice(list(major_set))
+            class_ = choice(list(class_set))
+            birthday = str(datetime.fromtimestamp(
+                time()-randint(0, 4*365*24*60*60))).split(' ')[0]
+            gender = choice(list(range(2)))
+            password = '1234'
+            teacher = f'{num},{name},{major},{birthday},{gender},{user_type},{class_},{password}\n'
+            teacher_data += teacher
+
+        f.write(teacher_data[:-1])
 
 
 if __name__ == '__main__':
     create_student_info_data()
+    create_teacher_info_data()

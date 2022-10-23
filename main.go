@@ -9,11 +9,11 @@ import (
 
 //初始化操作
 func init() {
-	score_init_err := model.Score{}.Read_to_buffer("model/score.txt")
+	score_init_err := model.Score{}.Read_to_buffer("model/data/score.txt")
 
-	student_init_err := model.Student{}.Read_to_buffer("model/student.txt")
-	teacher_init_err := model.Teacher{}.Read_to_buffer("model/teacher.txt")
-	manager_init_err := model.Manager{}.Read_to_buffer("model/manager.txt")
+	student_init_err := model.Student{}.Read_to_buffer("model/data/student.txt")
+	teacher_init_err := model.Teacher{}.Read_to_buffer("model/data/teacher.txt")
+	manager_init_err := model.Manager{}.Read_to_buffer("model/data/manager.txt")
 	if score_init_err != nil || student_init_err != nil || teacher_init_err != nil || manager_init_err != nil {
 		print("程序初始化失败...")
 		os.Exit(0) //直接退出程序
@@ -22,17 +22,22 @@ func init() {
 }
 
 func main() {
+label:
+	fmt.Print("11111\n")
+	// number, password, err := template.Login_menu()
 
-	number, password, err := template.Login_menu()
+	// if err == nil {
+	// 	fmt.Printf("number: %v\n", number)
+	// 	fmt.Printf("password: %v\n", password)
+	// }
 
-	if err == nil {
-		fmt.Printf("number: %v\n", number)
-		fmt.Printf("password: %v\n", password)
+	number := "2022000012"
+	password := "1234"
+
+	if len(number) != 10 {
+		fmt.Print("账号不正确...\n")
+		goto label
 	}
-	// number := "2022000011"
-	// password := "1234"
-	// var user model.User
-	// var user model.User
 	user_type := string(number[len(number)-1])
 
 	switch user_type {
@@ -44,23 +49,53 @@ func main() {
 			for {
 				func_choice := template.Student_main_menu()
 				switch func_choice {
-				case "1":
+				case 1:
 					user.Show_info()
-				case "2":
+				case 2:
 					user.Find()
-				case "3":
+				case 3:
 					user.Score_Pk()
-				case "4":
+				case 4:
 					user.Score_Analyse()
-				case "0":
-					fmt.Printf("欢迎再次使用...\n")
-					os.Exit(0)
+				case 0:
+					goto label
+
 				}
 			}
 
+		} else {
+			fmt.Print("密码不正确...\n")
+			goto label
 		}
-	// case "2":
-	// 	user := TEACHER_BUF[number] //教师
+	case "2":
+		user := model.TEACHER_BUF[number] //教师
+		ok := user.Login(number, password)
+		if ok {
+
+			for {
+				func_choice := template.Teacher_main_menu()
+				switch func_choice {
+				case 1:
+					user.Show_info()
+				case 2:
+					user.Student_Score_List()
+				case 3:
+					user.Search_Student_Score()
+				case 4:
+					user.Analyse_Class_Score()
+					// case 0:
+					goto label
+
+				}
+
+			}
+
+		} else {
+			fmt.Print("密码不正确...\n")
+			goto label
+
+		}
+
 	// case "3":
 	// 	user := MANAGER_BUF[number] //管理员
 	default:
