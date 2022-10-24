@@ -54,7 +54,7 @@ func (teacher Teacher) Read_to_buffer(filename string) (err error) {
 
 }
 
-//登录
+// 登录
 func (teacher Teacher) Login(num string, password string) (ok bool) {
 	s, ok := TEACHER_BUF[num]
 	return s.Password == password
@@ -79,7 +79,7 @@ func (teacher Teacher) Show_info() {
 	utils.Legal_input_string("按任意键继续...", map[string]string{})
 }
 
-//学生成绩列表
+// 学生成绩列表
 func (teacher Teacher) Student_Score_List() {
 
 	var score_list []Score
@@ -130,28 +130,36 @@ func (teacher Teacher) Student_Score_List() {
 
 }
 
-//查询学生成绩
+// 查询学生成绩
 func (teacher Teacher) Search_Student_Score() {
 	Student{}.Find()
 }
 
-//成绩分析
+// 成绩分析
 func (teacher Teacher) Analyse_Class_Score() {
 
 	//计算自己班的各科成绩的平均分
+	chinese_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	math_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	english_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	physical_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	chemistry_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	biology_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	sports_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	all_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
 
-	var  chinese_sum_mapping, math_sum_mapping, english_sum_mapping, physical_sum_mapping, chemistry_sum_mapping, biology_sum_mapping, sports_sum_mapping,all_sum_mapping map[int]int{1:0,2:0,3:0,4:0,5:0,6:0,7:0,8:0}
-	n := 0
-
+	n := 0 //学生人数
 
 	for _, v := range SCORE_BUF {
 		student := STUDENT_BUF[v.Num]
 		if student.Major == teacher.Major && student.Class == teacher.Class {
+			fmt.Printf("student: %v\n", student)
+
+			fmt.Printf("v: %v\n", v)
 			switch student.Semester {
 			case 1:
 				chinese_sum_mapping[student.Semester] += v.Chinese
 				n += 1 //班级人数加一
-
 			case 2:
 				math_sum_mapping[student.Semester] += v.Math
 			case 3:
@@ -175,7 +183,6 @@ func (teacher Teacher) Analyse_Class_Score() {
 	}
 
 	var s1, s2, s3, s4, s5, s6, s7, s8, s9 []string
-
 	subject_choice := utils.Legal_input_int("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:", map[int]string{1: "语文", 2: "数学", 3: "英语", 4: "物理", 5: "化学", 6: "生物", 7: "体育", 8: "总分"})
 	switch subject_choice {
 	case 1:

@@ -7,7 +7,7 @@ import (
 	"student-score-manage-system/template"
 )
 
-//初始化操作
+// 初始化操作
 func init() {
 	score_init_err := model.Score{}.Read_to_buffer("model/data/score.txt")
 
@@ -83,7 +83,8 @@ label:
 					user.Search_Student_Score()
 				case 4:
 					user.Analyse_Class_Score()
-					// case 0:
+
+				case 0:
 					goto label
 
 				}
