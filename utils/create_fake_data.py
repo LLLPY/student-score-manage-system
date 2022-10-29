@@ -2,7 +2,7 @@
 from datetime import datetime
 from time import time
 
-
+import os
 from random import choices, randint
 from secrets import choice
 
@@ -30,8 +30,10 @@ class_set = {
 
 
 def create_student_info_data(n=100):
+    student_data_path=os.path.join('..','model','data','student.txt')
+    score_data_path=os.path.join('..','model','data','score.txt')
 
-    with open('../model/data/student.txt', 'w', encoding='utf8') as f_student, open('../model/data/score.txt', 'w', encoding='utf8') as f_score:
+    with open(student_data_path, 'w', encoding='utf8') as f_student, open(score_data_path, 'w', encoding='utf8') as f_score:
         student_data = ''
         score_data = ''
         start = 202200001
@@ -71,7 +73,8 @@ def create_score_data():
 
 # 创建老师的数据
 def create_teacher_info_data(n=10):
-    with open('../model/data/teacher.txt', 'w', encoding='utf8') as f:
+    teacher_data_path=os.path.join('..','model','data','teacher.txt')
+    with open(teacher_data_path, 'w', encoding='utf8') as f:
         teacher_data = ''
         user_type = 2
         start = 202200001

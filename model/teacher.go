@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"sort"
 	"strconv"
@@ -54,7 +55,7 @@ func (teacher Teacher) Read_to_buffer(filename string) (err error) {
 
 }
 
-// 登录
+//登录
 func (teacher Teacher) Login(num string, password string) (ok bool) {
 	s, ok := TEACHER_BUF[num]
 	return s.Password == password
@@ -79,7 +80,7 @@ func (teacher Teacher) Show_info() {
 	utils.Legal_input_string("按任意键继续...", map[string]string{})
 }
 
-// 学生成绩列表
+//学生成绩列表
 func (teacher Teacher) Student_Score_List() {
 
 	var score_list []Score
@@ -130,15 +131,21 @@ func (teacher Teacher) Student_Score_List() {
 
 }
 
-// 查询学生成绩
+//查询学生成绩
 func (teacher Teacher) Search_Student_Score() {
 	Student{}.Find()
 }
 
-// 成绩分析
+//计算平均分和方差
+func cal_avage_square(score_map map[int]int) {
+
+}
+
+//成绩分析
 func (teacher Teacher) Analyse_Class_Score() {
 
 	//计算自己班的各科成绩的平均分
+
 	chinese_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
 	math_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
 	english_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
@@ -147,67 +154,228 @@ func (teacher Teacher) Analyse_Class_Score() {
 	biology_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
 	sports_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
 	all_sum_mapping := map[int]int{1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0}
+	n := 0
 
-	n := 0 //学生人数
-
+	for _, s := range STUDENT_BUF {
+		if s.Major == teacher.Major && s.Class == teacher.Class {
+			n++ //统计班级人数
+		}
+	}
 	for _, v := range SCORE_BUF {
 		student := STUDENT_BUF[v.Num]
 		if student.Major == teacher.Major && student.Class == teacher.Class {
-			fmt.Printf("student: %v\n", student)
-
-			fmt.Printf("v: %v\n", v)
-			switch student.Semester {
-			case 1:
-				chinese_sum_mapping[student.Semester] += v.Chinese
-				n += 1 //班级人数加一
-			case 2:
-				math_sum_mapping[student.Semester] += v.Math
-			case 3:
-				english_sum_mapping[student.Semester] += v.English
-			case 4:
-				physical_sum_mapping[student.Semester] += v.Physical
-			case 5:
-				chemistry_sum_mapping[student.Semester] += v.Chemistry
-			case 6:
-				biology_sum_mapping[student.Semester] += v.Biology
-			case 7:
-				sports_sum_mapping[student.Semester] += v.Sports
-			}
-
+			chinese_sum_mapping[v.Semester] += v.Chinese
+			math_sum_mapping[v.Semester] += v.Math
+			english_sum_mapping[v.Semester] += v.English
+			physical_sum_mapping[v.Semester] += v.Physical
+			chemistry_sum_mapping[v.Semester] += v.Chemistry
+			biology_sum_mapping[v.Semester] += v.Biology
+			sports_sum_mapping[v.Semester] += v.Sports
 		}
 
 	}
+
 	for i := 1; i <= len(Semester_List); i++ {
 		all_sum_mapping[i] = chinese_sum_mapping[i] + math_sum_mapping[i] + english_sum_mapping[i] + physical_sum_mapping[i] + chemistry_sum_mapping[i] + biology_sum_mapping[i] + sports_sum_mapping[i]
 
 	}
 
 	var s1, s2, s3, s4, s5, s6, s7, s8, s9 []string
+	var score_sum, score_avage, score_square, score_n int
+
 	subject_choice := utils.Legal_input_int("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:", map[int]string{1: "语文", 2: "数学", 3: "英语", 4: "物理", 5: "化学", 6: "生物", 7: "体育", 8: "总分"})
 	switch subject_choice {
 	case 1:
 		s1 = get_pillar(Semester_List[0], chinese_sum_mapping[1]/n, "语文")
-		s2 = get_pillar(Semester_List[1], math_sum_mapping[2]/n, "语文")
-		s3 = get_pillar(Semester_List[2], english_sum_mapping[3]/n, "语文")
-		s4 = get_pillar(Semester_List[3], physical_sum_mapping[4]/n, "语文")
-		s5 = get_pillar(Semester_List[4], chemistry_sum_mapping[5]/n, "语文")
-		s6 = get_pillar(Semester_List[5], biology_sum_mapping[6]/n, "语文")
-		s7 = get_pillar(Semester_List[6], sports_sum_mapping[7]/n, "语文")
-		s8 = get_pillar(Semester_List[7], all_sum_mapping[8]/n, "语文")
-		s9 = get_pillar("   语文     ", 0, "语文")
+		s2 = get_pillar(Semester_List[1], chinese_sum_mapping[2]/n, "语文")
+		s3 = get_pillar(Semester_List[2], chinese_sum_mapping[3]/n, "语文")
+		s4 = get_pillar(Semester_List[3], chinese_sum_mapping[4]/n, "语文")
+		s5 = get_pillar(Semester_List[4], chinese_sum_mapping[5]/n, "语文")
+		s6 = get_pillar(Semester_List[5], chinese_sum_mapping[6]/n, "语文")
+		s7 = get_pillar(Semester_List[6], chinese_sum_mapping[7]/n, "语文")
+		s8 = get_pillar(Semester_List[7], chinese_sum_mapping[8]/n, "语文")
+		s9 = get_pillar("语文平均分", 0, "语文")
+
+		for k, v := range chinese_sum_mapping {
+			if chinese_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range chinese_sum_mapping {
+			if chinese_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 
 	case 2:
+		s1 = get_pillar(Semester_List[0], math_sum_mapping[1]/n, "数学")
+		s2 = get_pillar(Semester_List[1], math_sum_mapping[2]/n, "数学")
+		s3 = get_pillar(Semester_List[2], math_sum_mapping[3]/n, "数学")
+		s4 = get_pillar(Semester_List[3], math_sum_mapping[4]/n, "数学")
+		s5 = get_pillar(Semester_List[4], math_sum_mapping[5]/n, "数学")
+		s6 = get_pillar(Semester_List[5], math_sum_mapping[6]/n, "数学")
+		s7 = get_pillar(Semester_List[6], math_sum_mapping[7]/n, "数学")
+		s8 = get_pillar(Semester_List[7], math_sum_mapping[8]/n, "数学")
+		s9 = get_pillar("数学平均分", 0, "数学")
+		for k, v := range math_sum_mapping {
+			if math_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range math_sum_mapping {
+			if math_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	case 3:
+		s1 = get_pillar(Semester_List[0], english_sum_mapping[1]/n, "英语")
+		s2 = get_pillar(Semester_List[1], english_sum_mapping[2]/n, "英语")
+		s3 = get_pillar(Semester_List[2], english_sum_mapping[3]/n, "英语")
+		s4 = get_pillar(Semester_List[3], english_sum_mapping[4]/n, "英语")
+		s5 = get_pillar(Semester_List[4], english_sum_mapping[5]/n, "英语")
+		s6 = get_pillar(Semester_List[5], english_sum_mapping[6]/n, "英语")
+		s7 = get_pillar(Semester_List[6], english_sum_mapping[7]/n, "英语")
+		s8 = get_pillar(Semester_List[7], english_sum_mapping[8]/n, "英语")
+		s9 = get_pillar("英语平均分", 0, "英语")
+		for k, v := range english_sum_mapping {
+			if english_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range english_sum_mapping {
+			if english_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	case 4:
+		s1 = get_pillar(Semester_List[0], physical_sum_mapping[1]/n, "物理")
+		s2 = get_pillar(Semester_List[1], physical_sum_mapping[2]/n, "物理")
+		s3 = get_pillar(Semester_List[2], physical_sum_mapping[3]/n, "物理")
+		s4 = get_pillar(Semester_List[3], physical_sum_mapping[4]/n, "物理")
+		s5 = get_pillar(Semester_List[4], physical_sum_mapping[5]/n, "物理")
+		s6 = get_pillar(Semester_List[5], physical_sum_mapping[6]/n, "物理")
+		s7 = get_pillar(Semester_List[6], physical_sum_mapping[7]/n, "物理")
+		s8 = get_pillar(Semester_List[7], physical_sum_mapping[8]/n, "物理")
+		s9 = get_pillar("物理平均分", 0, "物理")
+		for k, v := range physical_sum_mapping {
+			if physical_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range physical_sum_mapping {
+			if physical_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	case 5:
+		s1 = get_pillar(Semester_List[0], chemistry_sum_mapping[1]/n, "化学")
+		s2 = get_pillar(Semester_List[1], chemistry_sum_mapping[2]/n, "化学")
+		s3 = get_pillar(Semester_List[2], chemistry_sum_mapping[3]/n, "化学")
+		s4 = get_pillar(Semester_List[3], chemistry_sum_mapping[4]/n, "化学")
+		s5 = get_pillar(Semester_List[4], chemistry_sum_mapping[5]/n, "化学")
+		s6 = get_pillar(Semester_List[5], chemistry_sum_mapping[6]/n, "化学")
+		s7 = get_pillar(Semester_List[6], chemistry_sum_mapping[7]/n, "化学")
+		s8 = get_pillar(Semester_List[7], chemistry_sum_mapping[8]/n, "化学")
+		s9 = get_pillar("化学平均分", 0, "化学")
+		for k, v := range chemistry_sum_mapping {
+			if chemistry_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range chemistry_sum_mapping {
+			if chemistry_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	case 6:
+		s1 = get_pillar(Semester_List[0], biology_sum_mapping[1]/n, "生物")
+		s2 = get_pillar(Semester_List[1], biology_sum_mapping[2]/n, "生物")
+		s3 = get_pillar(Semester_List[2], biology_sum_mapping[3]/n, "生物")
+		s4 = get_pillar(Semester_List[3], biology_sum_mapping[4]/n, "生物")
+		s5 = get_pillar(Semester_List[4], biology_sum_mapping[5]/n, "生物")
+		s6 = get_pillar(Semester_List[5], biology_sum_mapping[6]/n, "生物")
+		s7 = get_pillar(Semester_List[6], biology_sum_mapping[7]/n, "生物")
+		s8 = get_pillar(Semester_List[7], biology_sum_mapping[8]/n, "生物")
+		s9 = get_pillar("生物平均分", 0, "生物")
+		for k, v := range biology_sum_mapping {
+			if biology_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range biology_sum_mapping {
+			if biology_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	case 7:
+		s1 = get_pillar(Semester_List[0], sports_sum_mapping[1]/n, "体育")
+		s2 = get_pillar(Semester_List[1], sports_sum_mapping[2]/n, "体育")
+		s3 = get_pillar(Semester_List[2], sports_sum_mapping[3]/n, "体育")
+		s4 = get_pillar(Semester_List[3], sports_sum_mapping[4]/n, "体育")
+		s5 = get_pillar(Semester_List[4], sports_sum_mapping[5]/n, "体育")
+		s6 = get_pillar(Semester_List[5], sports_sum_mapping[6]/n, "体育")
+		s7 = get_pillar(Semester_List[6], sports_sum_mapping[7]/n, "体育")
+		s8 = get_pillar(Semester_List[7], sports_sum_mapping[8]/n, "体育")
+		s9 = get_pillar("体育平均分", 0, "体育")
+		for k, v := range sports_sum_mapping {
+			if sports_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
+
+		score_avage = score_sum / score_n
+		for k, v := range sports_sum_mapping {
+			if sports_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	case 8:
+		s1 = get_pillar(Semester_List[0], all_sum_mapping[1]/n, "总分")
+		s2 = get_pillar(Semester_List[1], all_sum_mapping[2]/n, "总分")
+		s3 = get_pillar(Semester_List[2], all_sum_mapping[3]/n, "总分")
+		s4 = get_pillar(Semester_List[3], all_sum_mapping[4]/n, "总分")
+		s5 = get_pillar(Semester_List[4], all_sum_mapping[5]/n, "总分")
+		s6 = get_pillar(Semester_List[5], all_sum_mapping[6]/n, "总分")
+		s7 = get_pillar(Semester_List[6], all_sum_mapping[7]/n, "总分")
+		s8 = get_pillar(Semester_List[7], all_sum_mapping[8]/n, "总分")
+		s9 = get_pillar("总分平均分", 0, "总分")
+		for k, v := range all_sum_mapping {
+			if all_sum_mapping[k] != 0 {
+				score_sum += v / n
+				score_n++
+			}
+		}
 
+		score_avage = score_sum / score_n
+		for k, v := range all_sum_mapping {
+			if all_sum_mapping[k] != 0 {
+				score_square += int(math.Pow(float64(v/n-score_avage), 2))
+			}
+		}
 	}
-
+	s9[2] = "        "
+	fmt.Printf("\n平均分: %v\n", score_avage)
+	fmt.Printf("方  差: %v\n", score_square)
 	//打印柱状图
-	fmt.Printf("\n")
 	for i := len(s1) - 1; i >= 0; i-- {
 		fmt.Printf("%v%v%v%v%v%v%v%v%v\n",
 			s1[i], s2[i], s3[i], s4[i], s5[i], s6[i], s7[i], s8[i], s9[i],

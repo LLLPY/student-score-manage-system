@@ -2,6 +2,7 @@ package model
 
 import (
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -356,6 +357,7 @@ func Pk(course string, score1 int, score2 int, full_score int) {
 func get_pillar(semester string, score int, subject string) (s []string) {
 
 	s = []string{" " + semester + " ", "========"}
+
 	for i := 0; i < 20; i++ {
 		s = append(s, "        ")
 	}
@@ -363,10 +365,12 @@ func get_pillar(semester string, score int, subject string) (s []string) {
 	if subject == "总分" {
 		score /= 7
 	}
+
 	i := 2
 	for ; i < int(score/5)+2; i++ {
 		s[i] = "   #    "
 	}
+
 	if subject == "总分" {
 		score *= 7
 	}
@@ -385,10 +389,9 @@ func (student Student) Score_Analyse() {
 		}
 
 	}
-	var subject_choice int
 	var s1, s2, s3, s4, s5, s6, s7, s8, s9 []string
-
-	subject_choice = utils.Legal_input_int("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:", map[int]string{1: "语文", 2: "数学", 3: "英语", 4: "物理", 5: "化学", 6: "生物", 7: "体育", 8: "总分"})
+	var score_sum, score_avage, score_square, score_n int
+	subject_choice := utils.Legal_input_int("1.语文 2.数学 3.英语 4.物理 5.化学 6.生物 7.体育 8.总分\n请选择你要分析的内容:", map[int]string{1: "语文", 2: "数学", 3: "英语", 4: "物理", 5: "化学", 6: "生物", 7: "体育", 8: "总分"})
 	switch subject_choice {
 	case 1: //语文
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chinese, "语文")
@@ -400,6 +403,19 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Chinese, "语文")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Chinese, "语文")
 		s9 = get_pillar("   语文     ", 0, "语文")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].Chinese
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].Chinese - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
+
 	case 2:
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Math, "数学")
 		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Math, "数学")
@@ -410,6 +426,18 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Math, "数学")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Math, "数学")
 		s9 = get_pillar("   数学     ", 0, "数学")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].Math
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].Math - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	case 3:
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].English, "英语")
 		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].English, "英语")
@@ -420,6 +448,18 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].English, "英语")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].English, "英语")
 		s9 = get_pillar("   英语     ", 0, "英语")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].English
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].English - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	case 4:
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Physical, "物理")
 		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Physical, "物理")
@@ -430,6 +470,18 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Physical, "物理")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Physical, "物理")
 		s9 = get_pillar("   物理     ", 0, "物理")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].Physical
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].Physical - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	case 5:
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Chemistry, "化学")
 		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Chemistry, "化学")
@@ -440,6 +492,18 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Chemistry, "化学")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Chemistry, "化学")
 		s9 = get_pillar("   化学     ", 0, "化学")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].Chemistry
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].Chemistry - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	case 6:
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Biology, "生物")
 		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Biology, "生物")
@@ -450,6 +514,18 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Biology, "生物")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Biology, "生物")
 		s9 = get_pillar("   生物     ", 0, "生物")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].Biology
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].Biology - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	case 7:
 		s1 = get_pillar(Semester_List[0], semester_score_mapping[Semester_List[0]].Sports, "体育")
 		s2 = get_pillar(Semester_List[1], semester_score_mapping[Semester_List[1]].Sports, "体育")
@@ -460,6 +536,18 @@ func (student Student) Score_Analyse() {
 		s7 = get_pillar(Semester_List[6], semester_score_mapping[Semester_List[6]].Sports, "体育")
 		s8 = get_pillar(Semester_List[7], semester_score_mapping[Semester_List[7]].Sports, "体育")
 		s9 = get_pillar("   体育     ", 0, "体育")
+		for i := 0; i < student.Semester; i++ {
+			score_sum += semester_score_mapping[Semester_List[i]].Sports
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			sub := semester_score_mapping[Semester_List[i]].Sports - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	case 8:
 		var score_obj Score
 		score_obj = semester_score_mapping[Semester_List[0]]
@@ -487,11 +575,38 @@ func (student Student) Score_Analyse() {
 		s8 = get_pillar(Semester_List[7], score_obj.Chinese+score_obj.Math+score_obj.English+score_obj.Physical+score_obj.Chemistry+score_obj.Biology+score_obj.Sports, "总分")
 
 		s9 = get_pillar("   总分     ", 0, "总分")
+		for i := 0; i < student.Semester; i++ {
+			semester := semester_score_mapping[Semester_List[i]]
+
+			score_sum += (semester.Chinese +
+				semester.Math +
+				semester.English +
+				semester.Physical +
+				semester.Chemistry +
+				semester.Biology +
+				semester.Sports)
+			score_n++
+		}
+		score_avage = score_sum / score_n //平均分
+		tmp_sum := 0
+		for i := 0; i < student.Semester; i++ {
+			semester := semester_score_mapping[Semester_List[i]]
+			sub := (semester.Chinese +
+				semester.Math +
+				semester.English +
+				semester.Physical +
+				semester.Chemistry +
+				semester.Biology +
+				semester.Sports) - score_avage
+			tmp_sum += int(math.Pow(float64(sub), 2))
+
+		}
+		score_square = tmp_sum / score_n //方差
 	}
 	s9[2] = "        "
-
+	fmt.Printf("\n平均分: %v\n", score_avage)
+	fmt.Printf("方差: %v\n", score_square)
 	//打印柱状图
-	fmt.Printf("\n")
 	for i := len(s1) - 1; i >= 0; i-- {
 		fmt.Printf("%v%v%v%v%v%v%v%v%v\n",
 			s1[i], s2[i], s3[i], s4[i], s5[i], s6[i], s7[i], s8[i], s9[i],
