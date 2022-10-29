@@ -62,7 +62,7 @@ func (teacher Teacher) Login(num string, password string) (ok bool) {
 }
 
 // 显示个人信息
-func (teacher Teacher) Show_info() {
+func (teacher Teacher) Show_Persional_info() {
 	name := teacher.Name
 	num := teacher.Num
 	major := teacher.Major
@@ -385,72 +385,204 @@ func (teacher Teacher) Analyse_Class_Score() {
 
 }
 
-// 新增
-func (teacher Teacher) Create() (err error) {
+/////////////////////////管理班级////////////////////////////////////////////
+
+//打印学生信息列表
+func Show_Student_Info(student_list []Student) {
+	fmt.Printf("\n%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s\n",
+		"姓名", strings.Repeat("　", (20-len([]byte("姓名")))/3),
+		"学号", strings.Repeat("　", (20-len([]byte("学号")))/3),
+		"专业", strings.Repeat("　", (25-len([]byte("专业")))/3),
+		"班级", strings.Repeat("　", (15-len([]byte("班级")))/3),
+		"年级", strings.Repeat("　", (12-len([]byte("年级")))/3),
+		"性别", strings.Repeat("　", (12-len([]byte("性别")))/3),
+		"出生日期", strings.Repeat("　", (20-len([]byte("出生日期")))/3),
+	)
+	for _, v := range student_list {
+		fmt.Printf("%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s%-s\n",
+			v.Name, strings.Repeat("　", (20-len([]byte(v.Name)))/3),
+			v.Num, strings.Repeat("　", (15-len([]byte(v.Num)))/3),
+			v.Major, strings.Repeat("　", (25-len([]byte(v.Major)))/3),
+			v.Class, strings.Repeat("　", (13-len([]byte(v.Class)))/3),
+			Semester_Mapping[v.Semester], strings.Repeat("　", (15-len([]byte(Semester_Mapping[v.Semester])))/3),
+			Gender_Mapping[v.Gender], strings.Repeat("　", (10-len([]byte(Gender_Mapping[v.Gender])))/3),
+			v.Birthday, strings.Repeat("　", (20-len([]byte(v.Birthday)))/3),
+		)
+	}
+	fmt.Printf("\n")
+}
+
+//学生信息列表
+func (teacher Teacher) Student_Info_List() {
+	var student_list []Student
+	for _, v := range STUDENT_BUF {
+		if v.Class == teacher.Class {
+			student_list = append(student_list, v)
+		}
+	}
+	Show_Student_Info(student_list)
+
+}
+
+//查询学生信息
+func (teacher Teacher) Find_Student_Info() {
+	var num, name string
+	find_choice := utils.Legal_input_int("\n1.学号查找 2.姓名查找\n请选择查询方式:", map[int]string{1: "学号", 2: "姓名"})
+	if find_choice == 1 {
+		fmt.Printf("请输入学号：")
+		fmt.Scanln(&num)
+	} else {
+		fmt.Printf("请输入姓名：")
+		fmt.Scanln(&name)
+	}
+
+	var student_list []Student
+	if num != "" {
+		fmt.Printf("\n学号: %v\n", num)
+		s, ok := STUDENT_BUF[num]
+		if ok {
+			student_list = append(student_list, s)
+		}
+	} else {
+		fmt.Printf("\n姓名: %v\n", name)
+		for _, v := range STUDENT_BUF {
+			if v.Class == teacher.Class && strings.Index(v.Name, name) != -1 {
+				student_list = append(student_list, v)
+			}
+		}
+	}
+	if len(student_list) == 0 {
+		fmt.Printf("无相关信息...\n")
+	} else {
+		Show_Student_Info(student_list)
+	}
+}
+
+//更新学生信息
+func (teacher Teacher) Update_Student_Info() {
+	num := utils.Legal_input_string("请输入要修改的学生的学号：", map[string]string{})
+	_, ok := STUDENT_BUF[num]
+	if ok == false {
+		fmt.Printf("无此学号的相关信息...\n")
+	} else {
+		student := STUDENT_BUF[num]
+		name := utils.Legal_input_string("请输入新的姓名(旧："+student.Name+",不修改请直接回车):", map[string]string{})
+		if name != "" {
+			student.Name = name
+		}
+		for i := 1; ; i++ {
+			s, ok := Major_Mapping[i]
+			if ok {
+				fmt.Printf("%v.%s ", i, s)
+				if i%8 == 0 {
+					fmt.Printf("\n")
+				}
+			} else {
+				break
+			}
+
+		}
+		major := utils.Legal_input_int("请输入新的专业(旧："+student.Major+"):", Major_Mapping)
+		student.Major = Major_Mapping[major]
+		class := utils.Legal_input_string("请输入新的班级(旧："+student.Class+",不修改请直接回车):", map[string]string{})
+		if class != "" {
+			student.Class = class
+		}
+		for i := 1; ; i++ {
+			s, ok := Semester_Mapping[i]
+			if ok {
+				fmt.Printf("%v.%s ", i, s)
+				if i%8 == 0 {
+					fmt.Printf("\n")
+				}
+			} else {
+				break
+			}
+
+		}
+		semester := utils.Legal_input_int("请输入新的年级(旧："+Semester_Mapping[student.Semester]+"):", Semester_Mapping)
+		student.Semester = semester
+
+		gender := utils.Legal_input_int("[1.男 2.女] 请输入新的性别(旧："+Gender_Mapping[student.Gender]+"):", map[int]string{1: "男", 2: "女"})
+		gender--
+		student.Gender = gender
+		birthday := utils.Legal_input_string("请输入新的生日(旧："+student.Birthday+",不修改请直接回车):", map[string]string{})
+		if birthday != "" {
+			student.Birthday = birthday
+		}
+		STUDENT_BUF[num] = student
+
+	}
+
+}
+
+// 新增学生信息
+func (teacher Teacher) Add_Student_Info() bool {
 	var num, name, major, class, birthday, password string
 	var gender, semester int
-	//姓名
-	fmt.Print("请输入学号：")
-	fmt.Scanln(&num)
+	major = teacher.Major
+	class = teacher.Class
+	//学号
+	num = utils.Legal_input_string("请输入学号：", map[string]string{})
 	_, ok := STUDENT_BUF[num]
 	if ok {
 		fmt.Printf("该学号已存在！")
-		return
+		return false
 	}
-	fmt.Print("请输入姓名：")
-	fmt.Scanln(&name)
-	major = teacher.Major
-	class = teacher.Class
-	fmt.Print("请输入生日：")
-	fmt.Scanln(&birthday)
+	name = utils.Legal_input_string("请输入姓名：", map[string]string{})
+	birthday = utils.Legal_input_string("请输入生日：", map[string]string{})
 	for i := 0; i < len(Gender_Mapping); i++ {
 		print(strconv.Itoa(i+1) + "." + Gender_Mapping[i] + "  ")
-
 	}
-	fmt.Print("\n请输入性别：")
-	fmt.Scanln(&gender)
+	gender = utils.Legal_input_int("请输入性别：", map[int]string{1: "男", 2: "女"})
 	gender--
 	for i := 0; i < len(Semester_Mapping); i++ {
 		print(strconv.Itoa(i+1) + "." + Semester_Mapping[i+1] + "  ")
 
 	}
 	semester = utils.Legal_input_int("\n请输入学期：", Semester_Mapping)
-	fmt.Print("请输入密码：")
-	fmt.Scanln(&password)
-	s := Student{}
-	s.Name = name
-	s.Num = num
-	s.Major = major
-	s.Class = class
-	s.Birthday = birthday
-	s.Gender = gender
-	s.Semester = semester
-	s.Password = password
+	password = utils.Legal_input_string("请输入密码：", map[string]string{})
+	s := Student{
+		Name:     name,
+		Num:      num,
+		Major:    major,
+		Class:    class,
+		Birthday: birthday,
+		Gender:   gender,
+		Semester: semester,
+		Password: password,
+	}
+
 	STUDENT_BUF[num] = s
-	return nil
-}
-
-// 更新
-func (student Student) Update() {}
-
-// 更新学生信息
-func (student *Student) Update_info(name string, major string, class string, birthday string, gender int, grade int, password string, score_list []Score) {
-
+	return true
 }
 
 // 删除
-func (student Student) Delete() (err error) {
-	//删除STUDENT_BUF中的内容
-	delete(STUDENT_BUF, student.Num)
+func (teacher Teacher) Delete_Student_Info() bool {
+	num := utils.Legal_input_string("请输入要删除的学生的学号：", map[string]string{})
+	_, ok := STUDENT_BUF[num]
+	if ok == false {
+		fmt.Printf("无此学号的相关信息...\n")
+	} else {
+		Show_Student_Info([]Student{STUDENT_BUF[num]})
+		confirm := utils.Legal_input_int("是否确认删除([1.是 2:否]):", map[int]string{1: "是", 2: "否"})
+		if confirm == 1 {
+			//删除STUDENT_BUF中的内容
+			delete(STUDENT_BUF, num)
 
-	//删除SCORE_BUF中的内容
-	for i := 0; i < len(SCORE_BUF); i++ {
-		if SCORE_BUF[i].Num == student.Num {
-			SCORE_BUF = append(SCORE_BUF[:i], SCORE_BUF[i+1:]...)
-			i--
+			//删除SCORE_BUF中的内容
+			for i := 0; i < len(SCORE_BUF); i++ {
+				if SCORE_BUF[i].Num == num {
+					SCORE_BUF = append(SCORE_BUF[:i], SCORE_BUF[i+1:]...)
+					i--
+				}
+			}
+			return true
+
+		} else {
+			return false
 		}
-
 	}
-	return nil
+	return false
 
 }

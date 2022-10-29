@@ -71,18 +71,42 @@ label:
 		user := model.TEACHER_BUF[number] //教师
 		ok := user.Login(number, password)
 		if ok {
-
+		teacher_loop:
 			for {
 				func_choice := template.Teacher_main_menu()
 				switch func_choice {
 				case 1:
-					user.Show_info()
+					user.Show_Persional_info()
 				case 2:
 					user.Student_Score_List()
 				case 3:
 					user.Search_Student_Score()
 				case 4:
 					user.Analyse_Class_Score()
+				case 5:
+					for {
+						func_choice := template.Teacher_Manage_Class()
+						switch func_choice {
+						case 1:
+							user.Student_Info_List()
+						case 2:
+							user.Find_Student_Info()
+						case 3:
+							user.Add_Student_Info()
+						case 4:
+							user.Update_Student_Info()
+						case 5:
+							ok := user.Delete_Student_Info()
+							if ok {
+								fmt.Printf("删除成功!\n")
+							} else {
+								fmt.Printf("删除失败!\n")
+
+							}
+						case 0:
+							goto teacher_loop
+						}
+					}
 
 				case 0:
 					goto label

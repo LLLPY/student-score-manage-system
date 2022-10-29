@@ -24,16 +24,15 @@ type Score struct {
 
 // 学生
 type Student struct {
-	Num        string  //学号 学号的组成：年份 2022 编号 00001（00001到99999） 用户类型：1（1，2，3分别代表学生，教师和管理员）--》2022000011
-	Name       string  //姓名
-	Major      string  //专业
-	Class      string  //班级
-	Birthday   string  //出生日期
-	Gender     int     //性别 0：男 1：女
-	Semester   int     //年级 1：大一 2：大二 3：大三 4：大四
-	User_type  int     //用户类型 1：学生 2：教师 3：管理员
-	Password   string  //密码
-	Score_list []Score //成绩列表
+	Num       string //学号 学号的组成：年份 2022 编号 00001（00001到99999） 用户类型：1（1，2，3分别代表学生，教师和管理员）--》2022000011
+	Name      string //姓名
+	Major     string //专业
+	Class     string //班级
+	Birthday  string //出生日期
+	Gender    int    //性别 0：男 1：女
+	Semester  int    //年级 1：大一 2：大二 3：大三 4：大四
+	User_type int    //用户类型 1：学生 2：教师 3：管理员
+	Password  string //密码
 }
 
 // 将学生的成绩读取到缓冲
