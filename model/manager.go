@@ -62,7 +62,6 @@ func (manager Manager) Read_to_buffer(filename string) (err error) {
 
 // 登录
 func (manager Manager) Login(num string, password string) (msg string, ok bool) {
-	fmt.Printf("MANAGER_BUF: %v\n", MANAGER_BUF)
 	ok = true
 	//账号校验
 	if len(num) != 10 {
