@@ -22,38 +22,77 @@ type Manager struct {
 func (manager Manager) Read_to_buffer(filename string) (err error) {
 
 	if len(MANAGER_BUF) == 0 {
-		b, err := os.ReadFile(filename)
-		// print("读了文件")
+		content, err := os.ReadFile(filename)
 		if err != nil {
-			fmt.Printf("管理员信息读取失败: %v\n", err)
-			return err
+			path_list := strings.Split(filename, "/")
+			dirs := path_list[:len(path_list)-1]
+			os.MkdirAll(strings.Join(dirs, "/"), os.ModePerm) //创建目录
+			os.Create(filename)                               //创建文件
 		} else {
 			MANAGER_BUF = make(map[string]Manager)
-			data_list := strings.Split(string(b), "\n")
+			data_list := strings.Split(string(content), "\n")
 			for _, v := range data_list {
 				v_list := strings.Split(v, ",")
-				num := v_list[0]
-				name := v_list[1]
-				birthday := v_list[2]
-				gender, _ := strconv.Atoi(v_list[3])
-				user_type, _ := strconv.Atoi(v_list[4])
-				password := v_list[5]
-				MANAGER_BUF[num] = Manager{Num: num, Name: name, Birthday: birthday, Gender: gender, User_type: user_type, Password: password}
-				fmt.Printf("MANAGER_BUF[num]: %v\n", MANAGER_BUF[num])
+				if len(v_list) == 6 {
+					num := v_list[0]
+					name := v_list[1]
+					birthday := v_list[2]
+					gender, _ := strconv.Atoi(v_list[3])
+					user_type, _ := strconv.Atoi(v_list[4])
+					password := v_list[5]
+					manager := Manager{Num: num, Name: name, Birthday: birthday, Gender: gender, User_type: user_type, Password: password}
+					MANAGER_BUF[num] = manager
+
+				}
 			}
 		}
-
-		return nil
 	}
-	// print("没有读文件")
+	//初始化一个管理员
+	MANAGER_BUF["2022000013"] = Manager{
+		Name:      "root",
+		Num:       "2022000013",
+		Gender:    0,
+		User_type: 3,
+		Birthday:  "2022-10-12",
+		Password:  "1234",
+	}
 	return nil
 
 }
 
 // 登录
-func (manager Manager) Login(num string, password string) (ok bool) {
-	s, ok := MANAGER_BUF[num]
-	return s.Password == password
+func (manager Manager) Login(num string, password string) (msg string, ok bool) {
+	fmt.Printf("MANAGER_BUF: %v\n", MANAGER_BUF)
+	ok = true
+	//账号校验
+	if len(num) != 10 {
+		ok = false
+		msg = "账号长度不合法..."
+	}
+	year, _ := strconv.Atoi(num[:4])
+	if year < 2022 {
+		ok = false
+		msg = "账号不合法..."
+	}
+
+	user_type := string(num[len(num)-1])
+	if user_type != "1" && user_type != "2" && user_type != "3" {
+		ok = false
+		msg = "用户类型不合法..."
+	}
+
+	s, exit := MANAGER_BUF[num]
+	if !exit {
+		ok = false
+		msg = "账号不存在..."
+	} else {
+		ok = s.Password == password
+		if ok == false {
+			msg = "密码不正确..."
+		}
+	}
+	return msg, ok
+
 }
 
 // 显示个人信息

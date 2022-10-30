@@ -27,25 +27,41 @@ type Teacher struct {
 func (teacher Teacher) Read_to_buffer(filename string) (err error) {
 
 	if len(TEACHER_BUF) == 0 {
-		b, err := os.ReadFile(filename)
+		content, err := os.ReadFile(filename)
 		// print("读了文件")
 		if err != nil {
-			fmt.Printf("教师信息读取失败: %v\n", err)
-			return err
+			path_list := strings.Split(filename, "/")
+			dirs := path_list[:len(path_list)-1]
+			os.MkdirAll(strings.Join(dirs, "/"), os.ModePerm) //创建目录
+			os.Create(filename)                               //创建文件
 		} else {
 			TEACHER_BUF = make(map[string]Teacher)
-			data_list := strings.Split(string(b), "\n")
+			data_list := strings.Split(string(content), "\n")
 			for _, v := range data_list {
 				v_list := strings.Split(v, ",")
-				num := v_list[0]
-				name := v_list[1]
-				major := v_list[2]
-				birthday := v_list[3]
-				gender, _ := strconv.Atoi(v_list[4])
-				user_type, _ := strconv.Atoi(v_list[5])
-				class := v_list[6]
-				password := v_list[7]
-				TEACHER_BUF[num] = Teacher{Num: num, Name: name, Major: major, Birthday: birthday, Gender: gender, User_type: user_type, Class: class, Password: password}
+				if len(v_list) == 8 {
+					num := v_list[0]
+					name := v_list[1]
+					major := v_list[2]
+					birthday := v_list[3]
+					gender, _ := strconv.Atoi(v_list[4])
+					user_type, _ := strconv.Atoi(v_list[5])
+					class := v_list[6]
+					password := v_list[7]
+					teacher := Teacher{
+						Num:       num,
+						Name:      name,
+						Major:     major,
+						Birthday:  birthday,
+						Gender:    gender,
+						User_type: user_type,
+						Class:     class,
+						Password:  password,
+					}
+
+					TEACHER_BUF[num] = teacher
+				}
+
 			}
 		}
 		return nil
@@ -55,10 +71,58 @@ func (teacher Teacher) Read_to_buffer(filename string) (err error) {
 
 }
 
+//写入文件
+func (teacher Teacher) Write_To_File(filename string) {
+	teacher_data := ""
+	for _, v := range TEACHER_BUF {
+		num := v.Num
+		name := v.Name
+		major := v.Major
+		birthday := v.Birthday
+		gender := strconv.Itoa(v.Gender)
+		user_type := strconv.Itoa(v.User_type)
+		class := v.Class
+		password := v.Password
+
+		teacher := fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%s\n", num, name, major, birthday, gender, user_type, class, password)
+		teacher_data += teacher
+	}
+	os.WriteFile(filename, []byte(teacher_data), os.ModePerm)
+
+}
+
 //登录
-func (teacher Teacher) Login(num string, password string) (ok bool) {
-	s, ok := TEACHER_BUF[num]
-	return s.Password == password
+func (teacher Teacher) Login(num string, password string) (msg string, ok bool) {
+	ok = true
+	//账号校验
+	if len(num) != 10 {
+		ok = false
+		msg = "账号长度不合法..."
+	}
+	year, _ := strconv.Atoi(num[:4])
+	if year < 2022 {
+		ok = false
+		msg = "账号不合法..."
+	}
+
+	user_type := string(num[len(num)-1])
+	if user_type != "1" && user_type != "2" && user_type != "3" {
+		ok = false
+		msg = "用户类型不合法..."
+	}
+
+	s, exit := TEACHER_BUF[num]
+	if !exit {
+		ok = false
+		msg = "账号不存在..."
+	} else {
+		ok = s.Password == password
+		if ok == false {
+			msg = "密码不正确..."
+		}
+	}
+	return msg, ok
+
 }
 
 // 显示个人信息

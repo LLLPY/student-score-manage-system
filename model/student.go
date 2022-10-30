@@ -37,53 +37,112 @@ type Student struct {
 
 // 将学生的成绩读取到缓冲
 func (score Score) Read_to_buffer(filename string) (err error) {
-	b, err2 := os.ReadFile(filename)
+	content, err2 := os.ReadFile(filename)
 	if err2 != nil {
-		fmt.Printf("读取成绩失败: %v\n", err2)
+		path_list := strings.Split(filename, "/")
+		dirs := path_list[:len(path_list)-1]
+		os.MkdirAll(strings.Join(dirs, "/"), os.ModePerm) //创建目录
+		os.Create(filename)                               //创建文件
+		return nil
+
 	}
-	data_list := strings.Split(string(b), "\n")
+	data_list := strings.Split(string(content), "\n")
 	for _, v := range data_list {
 		v_list := strings.Split(v, ",")
-		num := v_list[0]
-		chinese, _ := strconv.Atoi(v_list[1])
-		math, _ := strconv.Atoi(v_list[2])
-		english, _ := strconv.Atoi(v_list[3])
-		physical, _ := strconv.Atoi(v_list[4])
-		chemistry, _ := strconv.Atoi(v_list[5])
-		biology, _ := strconv.Atoi(v_list[6])
-		sports, _ := strconv.Atoi(v_list[7])
-		semester, _ := strconv.Atoi(v_list[8])
-		tmp_score := Score{Num: num, Chinese: chinese, Math: math, English: english, Physical: physical, Chemistry: chemistry, Biology: biology, Sports: sports, Semester: semester}
-		SCORE_BUF = append(SCORE_BUF, tmp_score)
+		if len(v_list) == 9 {
+			num := v_list[0]
+			chinese, _ := strconv.Atoi(v_list[1])
+			math, _ := strconv.Atoi(v_list[2])
+			english, _ := strconv.Atoi(v_list[3])
+			physical, _ := strconv.Atoi(v_list[4])
+			chemistry, _ := strconv.Atoi(v_list[5])
+			biology, _ := strconv.Atoi(v_list[6])
+			sports, _ := strconv.Atoi(v_list[7])
+			semester, _ := strconv.Atoi(v_list[8])
+			tmp_score := Score{Num: num, Chinese: chinese, Math: math, English: english, Physical: physical, Chemistry: chemistry, Biology: biology, Sports: sports, Semester: semester}
+			SCORE_BUF = append(SCORE_BUF, tmp_score)
+		}
+
 	}
 	return nil
+}
+
+//写入文件
+func (student Student) Write_To_File(filename1 string, filename2 string) {
+	student_data := ""
+	for _, v := range STUDENT_BUF {
+		num := v.Num
+		name := v.Name
+		major := v.Major
+		class := v.Class
+		birthday := v.Birthday
+		gender := strconv.Itoa(v.Gender)
+		semester := strconv.Itoa(v.Semester)
+		user_type := strconv.Itoa(v.User_type)
+		password := v.Password
+		student := fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%s,%s\n", num, name, major, class, birthday, gender, semester, user_type, password)
+		student_data += student
+	}
+	os.WriteFile(filename1, []byte(student_data), os.ModePerm)
+
+	score_data := ""
+	for _, v := range SCORE_BUF {
+		num := v.Num
+		chinese := strconv.Itoa(v.Chinese)
+		math := strconv.Itoa(v.Math)
+		english := strconv.Itoa(v.English)
+		physical := strconv.Itoa(v.Physical)
+		chemistry := strconv.Itoa(v.Chemistry)
+		biology := strconv.Itoa(v.Biology)
+		sports := strconv.Itoa(v.Sports)
+		semester := strconv.Itoa(v.Semester)
+		score := fmt.Sprintf("%s,%s,%s,%s,%s,%s,%s,%s,%s\n", num, chinese, math, english, physical, chemistry, biology, sports, semester)
+		score_data += score
+	}
+	os.WriteFile(filename2, []byte(score_data), os.ModePerm)
+
 }
 
 // 将文件中的数据读到缓冲区，用的时候直接从缓冲区取，而不需要每次都从文件中读取
 func (student Student) Read_to_buffer(filename string) (err error) {
 
 	if len(STUDENT_BUF) == 0 {
-		b, err := os.ReadFile(filename)
-		// print("读了文件")
+		content, err := os.ReadFile(filename)
 		if err != nil {
-			fmt.Printf("学生信息读取失败: %v\n", err)
-			return err
+			path_list := strings.Split(filename, "/")
+			dirs := path_list[:len(path_list)-1]
+			os.MkdirAll(strings.Join(dirs, "/"), os.ModePerm) //创建目录
+			os.Create(filename)                               //创建文件
 		} else {
 			STUDENT_BUF = make(map[string]Student)
-			data_list := strings.Split(string(b), "\n")
+			data_list := strings.Split(string(content), "\n")
 			for _, v := range data_list {
 				v_list := strings.Split(v, ",")
-				num := v_list[0]
-				name := v_list[1]
-				major := v_list[2]
-				class := v_list[3]
-				birthday := v_list[4]
-				gender, _ := strconv.Atoi(v_list[5])
-				semester, _ := strconv.Atoi(v_list[6])
-				user_type, _ := strconv.Atoi(v_list[7])
-				password := v_list[8]
+				if len(v_list) == 9 {
+					num := v_list[0]
+					name := v_list[1]
+					major := v_list[2]
+					class := v_list[3]
+					birthday := v_list[4]
+					gender, _ := strconv.Atoi(v_list[5])
+					semester, _ := strconv.Atoi(v_list[6])
+					user_type, _ := strconv.Atoi(v_list[7])
+					password := v_list[8]
+					student := Student{
+						Num:       num,
+						Name:      name,
+						Major:     major,
+						Class:     class,
+						Birthday:  birthday,
+						Gender:    gender,
+						Semester:  semester,
+						User_type: user_type,
+						Password:  password,
+					}
 
-				STUDENT_BUF[num] = Student{Num: num, Name: name, Major: major, Class: class, Birthday: birthday, Gender: gender, Semester: semester, User_type: user_type, Password: password}
+					STUDENT_BUF[num] = student
+				}
+
 			}
 		}
 
@@ -114,9 +173,37 @@ func (student Student) Show_info() {
 }
 
 // 登录
-func (student Student) Login(num string, password string) (ok bool) {
-	s, ok := STUDENT_BUF[num]
-	return s.Password == password
+func (student Student) Login(num string, password string) (msg string, ok bool) {
+	ok = true
+	//账号校验
+	if len(num) != 10 {
+		ok = false
+		msg = "账号长度不合法..."
+	}
+	year, _ := strconv.Atoi(num[:4])
+	if year < 2022 {
+		ok = false
+		msg = "账号不合法..."
+	}
+
+	user_type := string(num[len(num)-1])
+	if user_type != "1" && user_type != "2" && user_type != "3" {
+		ok = false
+		msg = "用户类型不合法..."
+	}
+
+	s, exit := STUDENT_BUF[num]
+	if !exit {
+		ok = false
+		msg = "账号不存在..."
+	} else {
+		ok = s.Password == password
+		if ok == false {
+			msg = "密码不正确..."
+		}
+	}
+	return msg, ok
+
 }
 
 // 登出
