@@ -70,7 +70,6 @@ func (teacher Teacher) Show_Persional_info() {
 	gender := Gender_Mapping[teacher.Gender]
 	user_type := User_Type_Mapping[teacher.User_type]
 	birthday := teacher.Birthday
-	fmt.Printf("teacher: %v\n", teacher)
 	fmt.Printf("\n===================个人信息===================\n")
 	fmt.Printf("#   %s%s%-20s\n", "姓名："+name, strings.Repeat("　", (18-len([]byte(name)))/3), "职工号："+num)
 	fmt.Printf("#   %s%s%-20s\n", "专业："+major, strings.Repeat("　", (18-len([]byte(major)))/3), "班级："+class)
@@ -458,6 +457,47 @@ func (teacher Teacher) Find_Student_Info() {
 	}
 }
 
+// 新增学生信息
+func (teacher Teacher) Add_Student_Info() bool {
+	var num, name, major, class, birthday, password string
+	var gender, semester int
+	major = teacher.Major
+	class = teacher.Class
+	//学号
+	num = utils.Legal_input_string("请输入学号：", map[string]string{})
+	_, ok := STUDENT_BUF[num]
+	if ok {
+		fmt.Printf("该学号已存在！")
+		return false
+	}
+	name = utils.Legal_input_string("请输入姓名：", map[string]string{})
+	birthday = utils.Legal_input_string("请输入生日：", map[string]string{})
+	for i := 0; i < len(Gender_Mapping); i++ {
+		print(strconv.Itoa(i+1) + "." + Gender_Mapping[i] + "  ")
+	}
+	gender = utils.Legal_input_int("请输入性别：", map[int]string{1: "男", 2: "女"})
+	gender--
+	for i := 0; i < len(Semester_Mapping); i++ {
+		print(strconv.Itoa(i+1) + "." + Semester_Mapping[i+1] + "  ")
+
+	}
+	semester = utils.Legal_input_int("\n请输入学期：", Semester_Mapping)
+	password = utils.Legal_input_string("请输入密码：", map[string]string{})
+	s := Student{
+		Name:     name,
+		Num:      num,
+		Major:    major,
+		Class:    class,
+		Birthday: birthday,
+		Gender:   gender,
+		Semester: semester,
+		Password: password,
+	}
+
+	STUDENT_BUF[num] = s
+	return true
+}
+
 //更新学生信息
 func (teacher Teacher) Update_Student_Info() {
 	num := utils.Legal_input_string("请输入要修改的学生的学号：", map[string]string{})
@@ -516,48 +556,7 @@ func (teacher Teacher) Update_Student_Info() {
 
 }
 
-// 新增学生信息
-func (teacher Teacher) Add_Student_Info() bool {
-	var num, name, major, class, birthday, password string
-	var gender, semester int
-	major = teacher.Major
-	class = teacher.Class
-	//学号
-	num = utils.Legal_input_string("请输入学号：", map[string]string{})
-	_, ok := STUDENT_BUF[num]
-	if ok {
-		fmt.Printf("该学号已存在！")
-		return false
-	}
-	name = utils.Legal_input_string("请输入姓名：", map[string]string{})
-	birthday = utils.Legal_input_string("请输入生日：", map[string]string{})
-	for i := 0; i < len(Gender_Mapping); i++ {
-		print(strconv.Itoa(i+1) + "." + Gender_Mapping[i] + "  ")
-	}
-	gender = utils.Legal_input_int("请输入性别：", map[int]string{1: "男", 2: "女"})
-	gender--
-	for i := 0; i < len(Semester_Mapping); i++ {
-		print(strconv.Itoa(i+1) + "." + Semester_Mapping[i+1] + "  ")
-
-	}
-	semester = utils.Legal_input_int("\n请输入学期：", Semester_Mapping)
-	password = utils.Legal_input_string("请输入密码：", map[string]string{})
-	s := Student{
-		Name:     name,
-		Num:      num,
-		Major:    major,
-		Class:    class,
-		Birthday: birthday,
-		Gender:   gender,
-		Semester: semester,
-		Password: password,
-	}
-
-	STUDENT_BUF[num] = s
-	return true
-}
-
-// 删除
+// 删除学生信息
 func (teacher Teacher) Delete_Student_Info() bool {
 	num := utils.Legal_input_string("请输入要删除的学生的学号：", map[string]string{})
 	_, ok := STUDENT_BUF[num]

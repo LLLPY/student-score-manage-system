@@ -10,7 +10,6 @@ import (
 // 初始化操作
 func init() {
 	score_init_err := model.Score{}.Read_to_buffer("model/data/score.txt")
-
 	student_init_err := model.Student{}.Read_to_buffer("model/data/student.txt")
 	teacher_init_err := model.Teacher{}.Read_to_buffer("model/data/teacher.txt")
 	manager_init_err := model.Manager{}.Read_to_buffer("model/data/manager.txt")
@@ -22,23 +21,17 @@ func init() {
 }
 
 func main() {
-label:
-	fmt.Print("11111\n")
-	// number, password, err := template.Login_menu()
+main_loop:
+	number, password, _ := template.Login_menu()
 
-	// if err == nil {
-	// 	fmt.Printf("number: %v\n", number)
-	// 	fmt.Printf("password: %v\n", password)
-	// }
-
-	number := "2022000012"
-	password := "1234"
+	// number := "2022000013"
+	// password := "1234"
+	user_type := string(number[len(number)-1])
 
 	if len(number) != 10 {
 		fmt.Print("账号不正确...\n")
-		goto label
+		goto main_loop
 	}
-	user_type := string(number[len(number)-1])
 
 	switch user_type {
 	case "1": //学生
@@ -58,17 +51,17 @@ label:
 				case 4:
 					user.Score_Analyse()
 				case 0:
-					goto label
+					goto main_loop
 
 				}
 			}
 
 		} else {
 			fmt.Print("密码不正确...\n")
-			goto label
+			goto main_loop
 		}
-	case "2":
-		user := model.TEACHER_BUF[number] //教师
+	case "2": //教师
+		user := model.TEACHER_BUF[number]
 		ok := user.Login(number, password)
 		if ok {
 		teacher_loop:
@@ -109,7 +102,7 @@ label:
 					}
 
 				case 0:
-					goto label
+					goto main_loop
 
 				}
 
@@ -117,12 +110,45 @@ label:
 
 		} else {
 			fmt.Print("密码不正确...\n")
-			goto label
+			goto main_loop
 
 		}
 
-	// case "3":
-	// 	user := MANAGER_BUF[number] //管理员
+	case "3": //管理员
+		user := model.MANAGER_BUF[number]
+		ok := user.Login(number, password)
+		if ok {
+			for {
+				func_choice := template.Manager_Main_Menu()
+				switch func_choice {
+				case 1:
+					user.Show_Persional_info()
+				case 2:
+					user.Teacher_Info_List()
+				case 3:
+					user.Find_Teacher_Info()
+				case 4:
+					user.Add_Teacher_Info()
+				case 5:
+					user.Update_Teacher_Info()
+
+				case 6:
+					ok := user.Delete_Teacher_Info()
+					if ok {
+						fmt.Printf("删除成功!\n")
+					} else {
+						fmt.Printf("删除失败!\n")
+
+					}
+				case 0:
+					goto main_loop
+				}
+			}
+		} else {
+			fmt.Print("密码不正确...\n")
+			// goto main_loop
+		}
+
 	default:
 		println("用户身份未识别，程序已退出...\n")
 		os.Exit(0)
